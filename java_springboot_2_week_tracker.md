@@ -16,10 +16,10 @@ Get interview-ready for a backend training role focused on Java and Spring Boot 
 ## Environment Setup Checklist
 - [ x ] `java -version` works
 - [ x ] `javac -version` works
-- [ x ] `mvn -v` works
+- [ ] `mvn -v` works
 - [ x ] VS Code Java extensions installed
 - [ x ] PostgreSQL installed and reachable
-- [ ] Git repo initialized for your practice project
+- [ x ] Git repo initialized for your practice project
 
 ## Progress Dashboard
 
@@ -27,7 +27,7 @@ Use `Not Started`, `In Progress`, or `Done` in the Status column.
 
 | Day | Date | Focus | Status | Score (1-5) | Notes |
 |---|---|---|---|---:|---|
-| 1 | Tue Mar 10 | Java foundations | In Progress  |  |  |
+| 1 | Tue Mar 10 | Java foundations | Done  | 5 | new shit |
 | 2 | Wed Mar 11 | OOP fundamentals | Not Started |  |  |
 | 3 | Thu Mar 12 | Collections + Generics | Not Started |  |  |
 | 4 | Fri Mar 13 | Exceptions + Strings + Immutability | Not Started |  |  |
@@ -47,15 +47,15 @@ Use `Not Started`, `In Progress`, or `Done` in the Status column.
 ## Day-by-Day Detailed Tracker
 
 ## Day 1 - Java foundations (Tue Mar 10)
-- [ ] JDK, VS Code, terminal checks done
-- [ ] Primitive types, variables, operators, conditionals, loops
-- [ ] Methods: parameters, return types, scope
-- [ ] Practice: calculator, even/odd, max-of-3
-- [ ] Interview drill: explain JDK vs JRE vs JVM in under 60 seconds
+- [ x ] JDK, VS Code, terminal checks done
+- [ x ] Primitive types, variables, operators, conditionals, loops
+- [ x ] Methods: parameters, return types, scope
+- [ x ] Practice: calculator, even/odd, max-of-3
+- [ x ] Interview drill: explain JDK vs JRE vs JVM in under 60 seconds
 - Deliverable: `core-java/day1` code committed
 - Reflection:
-  - Wins:
-  - Gaps:
+  - Wins: learned how operators work in java and the difference between list and array , input and output in cli, switch cases,   
+  - Gaps: 
 
 ## Day 2 - OOP fundamentals (Wed Mar 11)
 - [ ] Classes, objects, constructors
