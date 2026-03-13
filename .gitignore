@@ -1,0 +1,106 @@
+##################################
+# Python
+##################################
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.pyo
+
+##################################
+# Virtual Environment
+##################################
+venv/
+env/
+ENV/
+.venv/
+.python-version
+
+##################################
+# Django
+##################################
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static/
+
+##################################
+# Environment variables
+##################################
+.env
+.env.*
+*.env
+
+##################################
+# Migrations (optional)
+# Uncomment if you don’t want migrations tracked
+# */migrations/*
+# !*/migrations/__init__.py
+##################################
+
+##################################
+# Testing / Coverage
+##################################
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+.tox/
+
+##################################
+# IDE / Editors
+##################################
+.vscode/
+.idea/
+*.swp
+*.swo
+.github/
+##################################
+# OS Files
+##################################
+.DS_Store
+Thumbs.db
+
+##################################
+# Logs
+##################################
+logs/
+*.log
+
+##################################
+# Docker
+##################################
+*.pid
+docker-compose.override.yml
+
+##################################
+# Celery
+##################################
+celerybeat-schedule
+
+##################################
+# Build / Distribution
+##################################
+build/
+dist/
+*.egg-info/
+.eggs/
+
+##################################
+# Node (if you use frontend)
+##################################
+node_modules/
+npm-debug.log
+yarn-error.log
+
+##################################
+# Temporary files
+##################################
+tmp/
+temp/
+plans/
+mypy.ini
