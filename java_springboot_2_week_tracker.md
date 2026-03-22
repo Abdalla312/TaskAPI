@@ -28,10 +28,10 @@ Use `Not Started`, `In Progress`, or `Done` in the Status column.
 | Day | Date | Focus | Status | Score (1-5) | Notes |
 |---|---|---|---|---:|---|
 | 1 | Tue Mar 10 | Java foundations | Done  | 5 | new shit |
-| 2 | Wed Mar 11 | OOP fundamentals | Not Started |  |  |
-| 3 | Thu Mar 12 | Collections + Generics | Not Started |  |  |
-| 4 | Fri Mar 13 | Exceptions + Strings + Immutability | Not Started |  |  |
-| 5 | Sat Mar 14 | Lambdas + Streams + Optional | Not Started |  |  |
+| 2 | Wed Mar 11 | OOP fundamentals | In Progress |  |  |
+| 3 | Thu Mar 12 | Collections + Generics | In Progress |  |  |
+| 4 | Fri Mar 13 | Exceptions + Strings + Immutability | In Progress |  |  |
+| 5 | Sat Mar 14 | Lambdas + Streams + Optional | In Progress |  |  |
 | 6 | Sun Mar 15 | SQL essentials | Not Started |  |  |
 | 7 | Mon Mar 16 | Java mini app + revision | Not Started |  |  |
 | 8 | Tue Mar 17 | Spring Boot basics | Not Started |  |  |
@@ -58,11 +58,11 @@ Use `Not Started`, `In Progress`, or `Done` in the Status column.
   - Gaps: 
 
 ## Day 2 - OOP fundamentals (Wed Mar 11)
-- [ ] Classes, objects, constructors
-- [ ] Encapsulation, inheritance, polymorphism, abstraction
-- [ ] Interface vs abstract class
+- [x] Classes, objects, constructors
+- [x] Encapsulation, inheritance, polymorphism, abstraction
+- [x] Interface vs abstract class
 - [ ] Practice: `Book`, `User`, `Task` domain model
-- [ ] Interview drill: overloading vs overriding
+- [x] Interview drill: overloading vs overriding
 - Deliverable: model package with at least 3 entities
 - Reflection:
   - Wins:
