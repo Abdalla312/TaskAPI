@@ -1,0 +1,38 @@
+BaseEntity (abstract)
+├── id : String
+├── createdAt : LocalDateTime
+│
+├── Person (abstract)
+│   ├── name : String
+│   ├── email : String
+│   └── getRole() : String
+│       │
+│       └── User
+│           ├── tasks : List<Task>
+│           ├── borrowedBooks : List<Book>
+│           ├── assignTask(task)
+│           ├── borrowBook(book)
+│           └── returnBook(book)
+│
+├── Book
+│   ├── title : String
+│   ├── author : String
+│   ├── isbn : String
+│   ├── borrowedBy : User
+│   └── implements Borrowable
+│
+└── Task
+    ├── title : String
+    ├── description : String
+    ├── status : TaskStatus
+    └── assignee : User
+
+Borrowable (interface)
+├── isAvailable()
+├── borrow(User user)
+└── giveBack()
+
+TaskStatus (enum)
+├── TODO
+├── IN_PROGRESS
+└── DONE
