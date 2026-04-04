@@ -1,5 +1,10 @@
 package com.example.taskapi.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 /**
  * Task entity — the core domain object of your API.
  *
@@ -17,9 +22,12 @@ package com.example.taskapi.model;
  * TODO (Day 4): Add @Entity, @Id, @GeneratedValue annotations
  * TODO (Day 5): Add @ManyToOne relationship to User
  */
+@Entity
+@Table(name="tasks")
 public class Task {
 
-    private Long id;
+    @Id @GeneratedValue private Long id;
+
     private String title;
     private String description;
     private String status; // TODO (Day 5): Replace with TaskStatus enum

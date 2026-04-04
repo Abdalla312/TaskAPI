@@ -1,6 +1,8 @@
 package com.example.taskapi.service;
 
 import com.example.taskapi.model.Task;
+import com.example.taskapi.repository.TaskRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,17 +32,19 @@ public class TaskService {
     // In-memory storage for Phase 1. Replaced with PostgreSQL in Phase 2.
     // Think of this like a temporary "database" — similar to Django's
     // in-memory SQLite for tests.
-    private final Map<Long, Task> tasks = new HashMap<>();
+    @Autowired private final TaskRepository taskRepository;
     private Long nextId = 1L;
 
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
     /**
      * Create a new task.
      * Django equivalent: Task.objects.create(title=title, description=description)
      */
     public Task createTask(Task task) {
-        task.setId(nextId++);
-        tasks.put(task.getId(), task);
-        return task;
+
+        return taskRepository.save(task);
     }
 
     /**
@@ -48,9 +52,8 @@ public class TaskService {
      * Django equivalent: Task.objects.all()
      */
     public List<Task> getAllTasks() {
-        return new ArrayList<>(tasks.values());
+        return taskRepository.findAll();
     }
-
     /**
      * Get a task by ID.
      * Django equivalent: Task.objects.filter(pk=id).first()
@@ -59,8 +62,9 @@ public class TaskService {
      * It's Java's way of avoiding null — like returning None in Python
      * but forcing you to handle the "not found" case explicitly.
      */
+
     public Optional<Task> getTaskById(Long id) {
-        return Optional.ofNullable(tasks.get(id));
+        return taskRepository.findById(id);
     }
 
     /**
@@ -68,19 +72,16 @@ public class TaskService {
      * Django equivalent: task = Task.objects.get(pk=id); task.title = new_title; task.save()
      */
     public Optional<Task> updateTask(Long id, Task updatedTask) {
-        if (!tasks.containsKey(id)) {
-            return Optional.empty();
-        }
-        updatedTask.setId(id);
-        tasks.put(id, updatedTask);
-        return Optional.of(updatedTask);
+
+        return Optional.of(taskRepository.save(updatedTask));
     }
 
     /**
      * Delete a task.
      * Django equivalent: Task.objects.filter(pk=id).delete()
      */
-    public boolean deleteTask(Long id) {
-        return tasks.remove(id) != null;
+    public void deleteTask(Long id) {
+
+        taskRepository.deleteById(id);
     }
 }
