@@ -11,33 +11,54 @@ server:
 spring:
   application:
     name: taskapi
-
+  config:
+    import: optional:file:.env[.properties]
   # ----- Database (PostgreSQL) -----
   # Django equivalent: DATABASES = { 'default': { ... } }
   # Uncomment and fill in when you reach Phase 2 (Day 4)
   #
-  # datasource:
-  #   url: jdbc:postgresql://localhost:5432/taskapi_db
-  #   username: your_pg_username
-  #   password: your_pg_password
-  #   driver-class-name: org.postgresql.Driver
+  datasource:
+    url: jdbc:postgresql://localhost:5432/taskapi_db
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  flyway:
+    # Enable Flyway migrations
+    enabled: true
+
+    # Location of migration scripts
+    locations: classpath:db/Migration
+
+    # Schema history table name
+    table: flyway_schema_history
+
+    # Baseline on migrate for existing database
+    baseline-on-migrate: false
+
+    # Validate migrations startup
+    validate-on-migrate: true
 
   # ----- JPA / Hibernate -----
   # Django equivalent: Django ORM auto-creates tables with migrate
   # 'create' = auto-create tables from entities (dev only!)
   # Later you'll switch to 'validate' when using Flyway migrations
   #
-  # jpa:
-  #   hibernate:
-  #     ddl-auto: create
-  #   show-sql: true
-  #   properties:
-  #     hibernate:
-  #       format_sql: true
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
   # ----- Disable database auto-config for now -----
   # Remove these two lines when you set up PostgreSQL in Phase 2
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+#  autoconfigure:
+#
+#    exclude:
+#      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+#      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+

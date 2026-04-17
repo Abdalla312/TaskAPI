@@ -1,6 +1,7 @@
 package com.example.taskapi.repository;
 
 import com.example.taskapi.model.Task;
+import com.example.taskapi.model.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -20,8 +21,7 @@ import java.util.List;
  * TODO (Day 5): Create UserRepository
  */
 public interface TaskRepository extends JpaRepository<Task, Long> {
-
-    List<Task> getTasksById(Long id);
-
-    Long id(Long id);
+    List<Task> findAllByStatus(TaskStatus status);
+    //findByTitleContainingIgnoreCase
+    List<Task> findByTitleContainingIgnoreCase(String title);
 }

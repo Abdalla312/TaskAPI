@@ -17,7 +17,7 @@ Get interview-ready for a backend training role focused on Java and Spring Boot 
 - [x] `java -version` works
 - [x] `javac -version` works
 - [x] `mvn -v` works (install Maven if missing — you'll need it for Spring Boot)
-- [ ] Understand Maven basics: `pom.xml`, dependencies, `mvn clean install`, `mvn spring-boot:run`
+- [x] Understand Maven basics: `pom.xml`, dependencies, `mvn clean install`, `mvn spring-boot:run`
 - [x] VS Code Java extensions installed
 - [x] PostgreSQL installed and reachable
 - [x] Git repo initialized for your practice project
@@ -28,22 +28,22 @@ Get interview-ready for a backend training role focused on Java and Spring Boot 
 
 Use `Not Started`, `In Progress`, or `Done` in the Status column.
 
-| Day | Date | Focus | Status             | Score (1-5) | Notes                                  |
-|---|---|---|--------------------|------------:|----------------------------------------|
-| 1 | Tue Mar 10 | Java foundations | Done               |           5 | new shit                               |
-| 2 | Wed Mar 11 | OOP fundamentals | Done               |           5 | took more than it needed but good shit |
-| 3 | Thu Mar 12 | Collections + Generics | In Progress      |             |                                        |
-| 4 | Fri Mar 13 | Exceptions + Strings + Immutability | Done most of it    |           3 |                                        |
-| 5 | Sat Mar 14 | Lambdas + Streams + Optional | In Progress        |           3 |                                        |
-| 6 | Sun Mar 15 | SQL essentials | Not Started        |             |                                        |
-| 7 | Mon Mar 16 | Java mini app + revision | Done most of it    |             |                                        |
-| 8 | Tue Mar 17 | Spring Boot basics | Not Started        |             |                                        |
-| 9 | Wed Mar 18 | REST API design | Not Started        |             |                                        |
-| 10 | Thu Mar 19 | Validation + error handling | Not Started        |             |                                        |
-| 11 | Fri Mar 20 | JPA + transactions + performance | Not Started        |             |                                        |
-| 12 | Sat Mar 21 | Security + JWT | Not Started        |             |                                        |
-| 13 | Sun Mar 22 | Testing + Testcontainers | Not Started        |             |                                        |
-| 14 | Mon Mar 23 | Mock interview + final polish | Not Started        |             |                                        |
+| Day | Date       | Focus                               | Status          | Score (1-5) | Notes                                  |
+|-----|------------|-------------------------------------|-----------------|------------:|----------------------------------------|
+| 1   | Tue Mar 10 | Java foundations                    | Done            |           5 | new shit                               |
+| 2   | Wed Mar 11 | OOP fundamentals                    | Done            |           5 | took more than it needed but good shit |
+| 3   | Thu Mar 12 | Collections + Generics              | In Progress     |             |                                        |
+| 4   | Fri Mar 13 | Exceptions + Strings + Immutability | Done most of it |           3 |                                        |
+| 5   | Sat Mar 14 | Lambdas + Streams + Optional        | In Progress     |           3 |                                        |
+| 6   | Sun Mar 15 | SQL essentials                      | Not Started     |             |                                        |
+| 7   | Mon Mar 16 | Java mini app + revision            | Done most of it |             |                                        |
+| 8   | Tue Mar 17 | Spring Boot basics                  | Not Started     |             |                                        |
+| 9   | Wed Mar 18 | REST API design                     | Not Started     |             |                                        |
+| 10  | Thu Mar 19 | Validation + error handling         | Not Started     |             |                                        |
+| 11  | Fri Mar 20 | JPA + transactions + performance    | Not Started     |             |                                        |
+| 12  | Sat Mar 21 | Security + JWT                      | Not Started     |             |                                        |
+| 13  | Sun Mar 22 | Testing + Testcontainers            | Not Started     |             |                                        |
+| 14  | Mon Mar 23 | Mock interview + final polish       | Not Started     |             |                                        |
 
 ---
 

@@ -8,20 +8,20 @@
 
 ## What You Already Know (Django → Spring Translation)
 
-| Django Concept | Spring Boot Equivalent | Notes |
-|---|---|---|
-| `models.py` | `@Entity` classes | JPA annotations instead of field classes |
-| `views.py` / `@api_view` | `@RestController` + `@GetMapping` etc. | Methods return objects, not `Response()` |
-| `serializers.py` | DTOs (plain Java classes) | No magic — just POJOs with getters/setters |
-| `urls.py` | `@RequestMapping` on controllers | Routes live on the controller, not in a separate file |
-| `settings.py` | `application.yml` | One config file, profiles for dev/prod |
-| Django ORM QuerySet | `JpaRepository` methods | `findById()`, `findByStatus()`, etc. |
-| `manage.py migrate` | Flyway migration SQL files | Write raw SQL migrations, not auto-generated |
-| Django middleware | `Filter` / `HandlerInterceptor` | Similar concept, different mechanism |
-| Django signals | `@EventListener` | Same pub/sub pattern |
-| `pip install` + `requirements.txt` | Maven `pom.xml` dependencies | XML is ugly but you only touch it occasionally |
-| Django Admin | — (no equivalent) | Build your own admin endpoints or use SpringDoc UI |
-| `python manage.py runserver` | `mvn spring-boot:run` | Runs on port 8080 by default |
+| Django Concept                     | Spring Boot Equivalent                 | Notes                                                 |
+|------------------------------------|----------------------------------------|-------------------------------------------------------|
+| `models.py`                        | `@Entity` classes                      | JPA annotations instead of field classes              |
+| `views.py` / `@api_view`           | `@RestController` + `@GetMapping` etc. | Methods return objects, not `Response()`              |
+| `serializers.py`                   | DTOs (plain Java classes)              | No magic — just POJOs with getters/setters            |
+| `urls.py`                          | `@RequestMapping` on controllers       | Routes live on the controller, not in a separate file |
+| `settings.py`                      | `application.yml`                      | One config file, profiles for dev/prod                |
+| Django ORM QuerySet                | `JpaRepository` methods                | `findById()`, `findByStatus()`, etc.                  |
+| `manage.py migrate`                | Flyway migration SQL files             | Write raw SQL migrations, not auto-generated          |
+| Django middleware                  | `Filter` / `HandlerInterceptor`        | Similar concept, different mechanism                  |
+| Django signals                     | `@EventListener`                       | Same pub/sub pattern                                  |
+| `pip install` + `requirements.txt` | Maven `pom.xml` dependencies           | XML is ugly but you only touch it occasionally        |
+| Django Admin                       | — (no equivalent)                      | Build your own admin endpoints or use SpringDoc UI    |
+| `python manage.py runserver`       | `mvn spring-boot:run`                  | Runs on port 8080 by default                          |
 
 ---
 
@@ -30,31 +30,31 @@
 **Goal**: A running Spring Boot app with an in-memory Task CRUD API.
 
 ### Day 1: First Boot (2 hrs)
-- [ ] Open the `taskapi/` project I created for you
-- [ ] Run `mvn spring-boot:run` — verify it starts on port 8080
-- [ ] Hit `http://localhost:8080/api/health` in browser — see `{"status": "UP"}`
-- [ ] Read through the starter code — understand `@RestController`, `@GetMapping`
-- [ ] **Java you'll learn**: annotations, method return types, String
+- [x] Open the `taskapi/` project I created for you
+- [x] Run `mvn spring-boot:run` — verify it starts on port 8080
+- [x] Hit `http://localhost:8080/api/health` in browser — see `{"status": "UP"}`
+- [x] Read through the starter code — understand `@RestController`, `@GetMapping`
+- [x] **Java you'll learn**: annotations, method return types, String
 
 **Deliverable**: App runs, health endpoint works ✅
 
 ### Day 2: Task Controller — List & Create (3 hrs)
-- [ ] Create `TaskController` with `@RestController` and `@RequestMapping("/api/tasks")`
-- [ ] Store tasks in a `List<Task>` in-memory for now (no database yet)
-- [ ] `POST /api/tasks` — accepts JSON body, adds to list, returns `201 Created`
-- [ ] `GET /api/tasks` — returns all tasks as JSON
-- [ ] Test with curl or Postman
-- [ ] **Java you'll learn**: `ArrayList`, generics (`List<Task>`), `@RequestBody`, JSON serialization
+- [x] Create `TaskController` with `@RestController` and `@RequestMapping("/api/tasks")`
+- [x] Store tasks in a `List<Task>` in-memory for now (no database yet)
+- [x] `POST /api/tasks` — accepts JSON body, adds to list, returns `201 Created`
+- [x] `GET /api/tasks` — returns all tasks as JSON
+- [x] Test with curl or Postman
+- [x] **Java you'll learn**: `ArrayList`, generics (`List<Task>`), `@RequestBody`, JSON serialization
 
 **Deliverable**: Can create and list tasks via API ✅
 
 ### Day 3: Full CRUD + Service Layer (3 hrs)
-- [ ] Extract business logic into `TaskService` (controller should only handle HTTP)
-- [ ] Add `GET /api/tasks/{id}`, `PUT /api/tasks/{id}`, `DELETE /api/tasks/{id}`
-- [ ] Use `@PathVariable` for ID extraction
-- [ ] Return proper status codes: `200`, `201`, `204`, `404`
+- [x] Extract business logic into `TaskService` (controller should only handle HTTP)
+- [x] Add `GET /api/tasks/{id}`, `PUT /api/tasks/{id}`, `DELETE /api/tasks/{id}`
+- [x] Use `@PathVariable` for ID extraction
+- [x] Return proper status codes: `200`, `201`, `204`, `404`
 - [ ] Add a simple `TaskNotFoundException` that returns 404
-- [ ] **Java you'll learn**: `HashMap`, `Optional`, exceptions, `ResponseEntity`
+- [x] **Java you'll learn**: `HashMap`, `Optional`, exceptions, `ResponseEntity`
 
 **Deliverable**: Full CRUD working, tested via Postman/curl ✅
 
@@ -65,42 +65,42 @@
 **Goal**: Replace in-memory storage with PostgreSQL using JPA.
 
 ### Day 4: Entity + Repository (3 hrs)
-- [ ] Add `@Entity` annotations to `Task` model
-- [ ] Create `TaskRepository extends JpaRepository<Task, Long>`
-- [ ] Configure PostgreSQL connection in `application.yml`
-- [ ] Switch `TaskService` to use `TaskRepository` instead of `HashMap`
-- [ ] Run app — verify data persists in PostgreSQL
-- [ ] **Java you'll learn**: JPA annotations, interfaces, generics in practice
+- [x] Add `@Entity` annotations to `Task` model
+- [x] Create `TaskRepository extends JpaRepository<Task, Long>`
+- [x] Configure PostgreSQL connection in `application.yml`
+- [x] Switch `TaskService` to use `TaskRepository` instead of `HashMap`
+- [x] Run app — verify data persists in PostgreSQL
+- [x] **Java you'll learn**: JPA annotations, interfaces, generics in practice
 
 **Deliverable**: Tasks persist in PostgreSQL ✅
 
 ### Day 5: Relationships + Enums (3 hrs)
-- [ ] Add `User` entity with `id`, `name`, `email`
-- [ ] Add `TaskStatus` enum: `TODO`, `IN_PROGRESS`, `DONE`
-- [ ] Create `@ManyToOne` relationship: Task belongs to a User
-- [ ] Create `UserRepository` and `UserService`
-- [ ] `POST /api/users` and `GET /api/users`
-- [ ] Assign tasks to users: `PUT /api/tasks/{id}/assign/{userId}`
-- [ ] **Java you'll learn**: enums (as classes), `@Enumerated`, relationship mapping
+- [x] Add `User` entity with `id`, `name`, `email`
+- [x] Add `TaskStatus` enum: `TODO`, `IN_PROGRESS`, `DONE`
+- [x] Create `@ManyToOne` relationship: Task belongs to a User
+- [x] Create `UserRepository` and `UserService`
+- [x] `POST /api/users` and `GET /api/users`
+- [x] Assign tasks to users: `PATCH /api/tasks/{id}/assign/{userId}`
+- [x] **Java you'll learn**: enums (as classes), `@Enumerated`, relationship mapping
 
 **Deliverable**: Users + Tasks with relationships in DB ✅
 
 ### Day 6: Flyway Migrations (2 hrs)
-- [ ] Add Flyway dependency to `pom.xml`
-- [ ] Delete the auto-generated tables from `spring.jpa.hibernate.ddl-auto=create`
-- [ ] Write `V1__create_users_table.sql` and `V2__create_tasks_table.sql`
-- [ ] Switch to `ddl-auto=validate` — Flyway handles schema now
-- [ ] Run app — confirm tables created by Flyway
-- [ ] **Django parallel**: This is exactly like `makemigrations` + `migrate`, but you write SQL manually
+- [x] Add Flyway dependency to `pom.xml`
+- [x] Delete the auto-generated tables from `spring.jpa.hibernate.ddl-auto=create`
+- [x] Write `V1__create_users_table.sql` and `V2__create_tasks_table.sql`
+- [x] Switch to `ddl-auto=validate` — Flyway handles schema now
+- [x] Run app — confirm tables created by Flyway
+- [x] **Django parallel**: This is exactly like `makemigrations` + `migrate`, but you write SQL manually
 
 **Deliverable**: Database managed by migration scripts ✅
 
 ### Day 7: Custom Queries + Streams (2 hrs)
-- [ ] Add query methods: `findByStatus()`, `findByTitleContainingIgnoreCase()`
-- [ ] Write a `@Query` with JPQL for complex queries
-- [ ] Use Java Streams in service layer: filter, map, collect
-- [ ] `GET /api/tasks?status=IN_PROGRESS` — filtered list
-- [ ] **Java you'll learn**: Streams (`filter`, `map`, `collect`), lambda expressions
+- [x] Add query methods: `findByStatus()`, `findByTitleContainingIgnoreCase()`
+- [x] Write a `@Query` with JPQL for complex queries
+- [x] Use Java Streams in service layer: filter, map, collect
+- [x] `GET /api/tasks?status=IN_PROGRESS` — filtered list
+- [x] **Java you'll learn**: Streams (`filter`, `map`, `collect`), lambda expressions
 
 **Deliverable**: Filtered queries and stream-based transformations working ✅
 
@@ -111,11 +111,11 @@
 **Goal**: Add validation, error handling, DTOs, pagination — the patterns real APIs need.
 
 ### Day 8: DTOs + Mapping (2 hrs)
-- [ ] Create `TaskRequest` DTO (what client sends) and `TaskResponse` DTO (what API returns)
-- [ ] Never expose `@Entity` directly in API responses (same reason as DRF serializers)
-- [ ] Create a `TaskMapper` class to convert between Entity ↔ DTO
-- [ ] Update controller to accept `TaskRequest` and return `TaskResponse`
-- [ ] **Django parallel**: DTOs = serializers, but without auto-magic. More verbose, more control.
+- [x] Create `TaskRequest` DTO (what client sends) and `TaskResponse` DTO (what API returns)
+- [x] Never expose `@Entity` directly in API responses (same reason as DRF serializers)
+- [x] Create a `TaskMapper` class to convert between Entity ↔ DTO
+- [x] Update controller to accept `TaskRequest` and return `TaskResponse`
+- [x] **Django parallel**: DTOs = serializers, but without auto-magic. More verbose, more control.
 
 **Deliverable**: API uses DTOs, entities never exposed ✅
 

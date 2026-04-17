@@ -1,6 +1,9 @@
 package com.example.taskapi.controller;
 
-import com.example.taskapi.model.Task;
+import com.example.taskapi.dto.TaskRequestDTO;
+import com.example.taskapi.dto.TaskResponseDTO;
+import com.example.taskapi.exception.ResourceNotFoundException;
+import com.example.taskapi.model.TaskStatus;
 import com.example.taskapi.service.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,27 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Task controller — handles all HTTP requests for /api/tasks.
- *
- * Django equivalent:
- *   class TaskViewSet(viewsets.ModelViewSet):
- *       queryset = Task.objects.all()
- *       serializer_class = TaskSerializer
- *
- * But in Spring, you wire things manually — more code, more control.
- *
- * Key annotations:
- * - @RestController = "I handle HTTP and return JSON"
- * - @RequestMapping = "base URL path" (like router.register in DRF)
- * - @GetMapping, @PostMapping, etc. = specific HTTP methods
- * - @RequestBody = "parse the JSON body into this Java object" (like serializer.data)
- * - @PathVariable = "extract {id} from the URL" (like <int:pk> in Django URLs)
- *
- * The constructor takes TaskService as a parameter. Spring automatically
- * provides it — this is Dependency Injection. In Django, you'd just
- * import and call Task.objects directly. Here, Spring manages the wiring.
- */
+
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
@@ -41,51 +24,41 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    /**
-     * GET /api/tasks — list all tasks
-     * Django: def list(self, request): return Response(TaskSerializer(tasks, many=True).data)
-     */
     @GetMapping
-    public ResponseEntity<List<Task>> getAllTasks() {
+    public ResponseEntity<List<TaskResponseDTO>> getAllTasks() {
         return ResponseEntity.ok(taskService.getAllTasks());
     }
 
-    /**
-     * GET /api/tasks/{id} — get one task
-     * Django: def retrieve(self, request, pk): task = get_object_or_404(Task, pk=pk)
-     */
+    @GetMapping(params = "status")
+    public ResponseEntity<List<TaskResponseDTO>> getTasksByStatus(@RequestParam TaskStatus status) {
+        return ResponseEntity.ok(taskService.findTasksByStatus(status));
+    }
+
+    @GetMapping(params = "title")
+    public ResponseEntity<List<TaskResponseDTO>> getTaskByTitle(@RequestParam String title) {
+        return ResponseEntity.ok(taskService.findTaskByTitle(title));
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
+    public ResponseEntity<TaskResponseDTO> getTaskById(@PathVariable Long id) {
         return taskService.getTaskById(id)
                 .map(ResponseEntity::ok)                           // found → 200
                 .orElse(ResponseEntity.notFound().build());        // not found → 404
     }
 
-    /**
-     * POST /api/tasks — create a new task
-     * Django: def create(self, request): serializer.save()
-     */
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody Task task) {
-        Task created = taskService.createTask(task);
+    public ResponseEntity<TaskResponseDTO> createTask(@RequestBody TaskRequestDTO task) {
+        TaskResponseDTO created = taskService.createTask(task);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);  // 201
     }
 
-    /**
-     * PUT /api/tasks/{id} — update a task
-     * Django: def update(self, request, pk): serializer.save()
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task task) {
+    @PatchMapping("/{id}")
+    public ResponseEntity<TaskResponseDTO> updateTask(@PathVariable Long id, @RequestBody TaskRequestDTO task) {
         return taskService.updateTask(id, task)
                 .map(ResponseEntity::ok)                           // updated → 200
                 .orElse(ResponseEntity.notFound().build());        // not found → 404
     }
 
-    /**
-     * DELETE /api/tasks/{id} — delete a task
-     * Django: def destroy(self, request, pk): task.delete()
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         if (taskService.deleteTask(id)) {
@@ -93,4 +66,13 @@ public class TaskController {
         }
         return ResponseEntity.notFound().build();                  // not found → 404
     }
+
+    @PatchMapping("/{id}/assign/{userId}")
+    public ResponseEntity<TaskResponseDTO> assignTaskToUser(@PathVariable Long id, @PathVariable Long userId) {
+        return taskService.assignTaskToUser(id, userId)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResourceNotFoundException("User or Task id not found."));
+    }
+
+
 }
