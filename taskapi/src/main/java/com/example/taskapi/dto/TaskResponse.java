@@ -7,9 +7,13 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class TaskResponseDTO {
+public class TaskResponse {
     private Long id;
     private String title;
     private String description;
+    private String taskStatus;
+    private Long userId;
     private LocalDateTime updatedAt;
+    private LocalDateTime createdAt;
+
 }

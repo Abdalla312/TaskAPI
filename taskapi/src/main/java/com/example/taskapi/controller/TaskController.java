@@ -1,9 +1,8 @@
 package com.example.taskapi.controller;
 
-import com.example.taskapi.dto.TaskRequestDTO;
-import com.example.taskapi.dto.TaskResponseDTO;
+import com.example.taskapi.dto.TaskRequest;
+import com.example.taskapi.dto.TaskResponse;
 import com.example.taskapi.exception.ResourceNotFoundException;
-import com.example.taskapi.model.TaskStatus;
 import com.example.taskapi.service.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,38 +24,34 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskResponseDTO>> getAllTasks() {
+    public ResponseEntity<List<TaskResponse>> getAllTasks() {
         return ResponseEntity.ok(taskService.getAllTasks());
     }
 
     @GetMapping(params = "status")
-    public ResponseEntity<List<TaskResponseDTO>> getTasksByStatus(@RequestParam TaskStatus status) {
+    public ResponseEntity<List<TaskResponse>> getTasksByStatus(@RequestParam String status) {
         return ResponseEntity.ok(taskService.findTasksByStatus(status));
     }
 
     @GetMapping(params = "title")
-    public ResponseEntity<List<TaskResponseDTO>> getTaskByTitle(@RequestParam String title) {
+    public ResponseEntity<List<TaskResponse>> getTaskByTitle(@RequestParam String title) {
         return ResponseEntity.ok(taskService.findTaskByTitle(title));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskResponseDTO> getTaskById(@PathVariable Long id) {
-        return taskService.getTaskById(id)
-                .map(ResponseEntity::ok)                           // found → 200
-                .orElse(ResponseEntity.notFound().build());        // not found → 404
+    public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
+        return ResponseEntity.ok(taskService.getTaskById(id));        // not found → 404
     }
 
     @PostMapping
-    public ResponseEntity<TaskResponseDTO> createTask(@RequestBody TaskRequestDTO task) {
-        TaskResponseDTO created = taskService.createTask(task);
+    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest task) {
+        TaskResponse created = taskService.createTask(task);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);  // 201
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<TaskResponseDTO> updateTask(@PathVariable Long id, @RequestBody TaskRequestDTO task) {
-        return taskService.updateTask(id, task)
-                .map(ResponseEntity::ok)                           // updated → 200
-                .orElse(ResponseEntity.notFound().build());        // not found → 404
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable Long id, @RequestBody TaskRequest task) {
+        return ResponseEntity.ok(taskService.updateTask(id, task));        // not found → 404
     }
 
     @DeleteMapping("/{id}")
@@ -68,7 +63,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}/assign/{userId}")
-    public ResponseEntity<TaskResponseDTO> assignTaskToUser(@PathVariable Long id, @PathVariable Long userId) {
+    public ResponseEntity<TaskResponse> assignTaskToUser(@PathVariable Long id, @PathVariable Long userId) {
         return taskService.assignTaskToUser(id, userId)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceNotFoundException("User or Task id not found."));

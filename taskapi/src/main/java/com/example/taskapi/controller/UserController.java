@@ -1,9 +1,9 @@
 package com.example.taskapi.controller;
 
-import com.example.taskapi.dto.UserRequestDTO;
-import com.example.taskapi.dto.UserResponseDTO;
-import com.example.taskapi.exception.ResourceNotFoundException;
+import com.example.taskapi.dto.UserRequest;
+import com.example.taskapi.dto.UserResponse;
 import com.example.taskapi.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,36 +21,30 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
-        return userService.getUserById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserRequestDTO dto){
-        UserResponseDTO responseDTO = userService.createUser(dto);
+    public ResponseEntity<UserResponse> createUser(@RequestBody @Valid UserRequest dto) {
+        UserResponse responseDTO = userService.createUser(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody UserRequestDTO userDTO)
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody @Valid UserRequest userDTO)
     {
-        return userService.updateUser(id, userDTO)
-                .map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: "+id));
+        return ResponseEntity.ok(userService.updateUser(id, userDTO));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){
-        if(userService.deleteUser(id)){
-            return ResponseEntity.noContent().build(); // deleted -> 204
-        }
-        return ResponseEntity.notFound().build();   // not found -> 404
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build(); // deleted -> 204
     }
 }

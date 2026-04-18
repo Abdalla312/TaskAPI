@@ -24,7 +24,7 @@ public class Task {
 
     //foreign key users.id
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = true)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column(nullable = false)
@@ -48,19 +48,13 @@ public class Task {
     private LocalDateTime updatedAt;
 
 
-    // --- Constructors ---
-    public Task() {
-    }
+    public Task() {}
 
     public Task(String title, String description) {
         this.title = title;
         this.description = description;
         this.status = TaskStatus.TODO;
     }
-
-    // --- Getters and Setters ---
-    // Django does this automatically. In Java, you write them explicitly.
-    // When you add Lombok later, @Data generates all of these for you.
 
     @Override
     public String toString() {
