@@ -1,4 +1,4 @@
-package com.example.taskapi.dto;
+package com.example.taskapi.task.dto;
 
 import lombok.Getter;
 import lombok.Setter;

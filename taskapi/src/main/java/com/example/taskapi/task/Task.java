@@ -1,5 +1,6 @@
-package com.example.taskapi.model;
+package com.example.taskapi.task;
 
+import com.example.taskapi.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

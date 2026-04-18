@@ -120,13 +120,13 @@
 **Deliverable**: API uses DTOs, entities never exposed ✅
 
 ### Day 9: Validation + Error Handling (3 hrs)
-- [ ] Add Bean Validation annotations: `@NotBlank`, `@Size`, `@Email` on DTOs
-- [ ] Use `@Valid` in controller parameters
+- [x] Add Bean Validation annotations: `@NotBlank`, `@Size`, `@Email` on DTOs
+- [x] Use `@Valid` in controller parameters
 - [ ] Create `GlobalExceptionHandler` with `@ControllerAdvice`
 - [ ] Handle `MethodArgumentNotValidException` → return `400` with field errors
 - [ ] Handle `ResourceNotFoundException` → return `404`
 - [ ] Handle generic `Exception` → return `500` (never leak stack traces)
-- [ ] Consistent error response format: `{ timestamp, status, error, message }`
+- [x] Consistent error response format: `{ timestamp, status, error, message }`
 - [ ] **Django parallel**: `@ControllerAdvice` ≈ DRF's `exception_handler`. Validation annotations ≈ serializer field validation.
 
 **Deliverable**: Clean validation errors, consistent error JSON format ✅

@@ -1,4 +1,4 @@
-package com.example.taskapi.model;
+package com.example.taskapi.task;
 
 
 public enum TaskStatus {

@@ -1,4 +1,4 @@
-package com.example.taskapi.controller;
+package com.example.taskapi.common;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

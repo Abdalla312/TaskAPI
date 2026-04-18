@@ -1,4 +1,4 @@
-package com.example.taskapi.exception;
+package com.example.taskapi.common.dto;
 
 import lombok.Getter;
 import lombok.Setter;

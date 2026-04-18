@@ -1,9 +1,8 @@
-package com.example.taskapi.controller;
+package com.example.taskapi.task;
 
-import com.example.taskapi.dto.TaskRequest;
-import com.example.taskapi.dto.TaskResponse;
-import com.example.taskapi.exception.ResourceNotFoundException;
-import com.example.taskapi.service.TaskService;
+import com.example.taskapi.task.dto.TaskRequest;
+import com.example.taskapi.task.dto.TaskResponse;
+import com.example.taskapi.common.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

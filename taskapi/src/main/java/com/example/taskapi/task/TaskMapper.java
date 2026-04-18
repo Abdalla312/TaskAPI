@@ -1,8 +1,7 @@
-package com.example.taskapi.mapper;
+package com.example.taskapi.task;
 
-import com.example.taskapi.dto.TaskResponse;
-import com.example.taskapi.dto.TaskRequest;
-import com.example.taskapi.model.Task;
+import com.example.taskapi.task.dto.TaskResponse;
+import com.example.taskapi.task.dto.TaskRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 

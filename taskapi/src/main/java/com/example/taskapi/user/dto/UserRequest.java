@@ -1,4 +1,4 @@
-package com.example.taskapi.dto;
+package com.example.taskapi.user.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.Getter;

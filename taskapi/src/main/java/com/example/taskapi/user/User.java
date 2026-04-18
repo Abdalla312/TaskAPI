@@ -1,5 +1,6 @@
-package com.example.taskapi.model;
+package com.example.taskapi.user;
 
+import com.example.taskapi.task.Task;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package com.example.taskapi.exception;
+package com.example.taskapi.common.exception;
 
 
 public class ResourceNotFoundException extends RuntimeException{

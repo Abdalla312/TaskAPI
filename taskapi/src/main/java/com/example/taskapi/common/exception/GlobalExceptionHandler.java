@@ -1,5 +1,6 @@
-package com.example.taskapi.exception;
+package com.example.taskapi.common.exception;
 
+import com.example.taskapi.common.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

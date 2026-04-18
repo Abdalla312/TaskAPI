@@ -1,8 +1,7 @@
-package com.example.taskapi.controller;
+package com.example.taskapi.user;
 
-import com.example.taskapi.dto.UserRequest;
-import com.example.taskapi.dto.UserResponse;
-import com.example.taskapi.service.UserService;
+import com.example.taskapi.user.dto.UserRequest;
+import com.example.taskapi.user.dto.UserResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

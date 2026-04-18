@@ -1,8 +1,7 @@
-package com.example.taskapi.mapper;
+package com.example.taskapi.user;
 
-import com.example.taskapi.dto.UserRequest;
-import com.example.taskapi.dto.UserResponse;
-import com.example.taskapi.model.User;
+import com.example.taskapi.user.dto.UserRequest;
+import com.example.taskapi.user.dto.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 

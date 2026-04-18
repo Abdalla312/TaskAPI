@@ -1,7 +1,5 @@
-package com.example.taskapi.repository;
+package com.example.taskapi.task;
 
-import com.example.taskapi.model.Task;
-import com.example.taskapi.model.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.example.taskapi.dto;
+package com.example.taskapi.task.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

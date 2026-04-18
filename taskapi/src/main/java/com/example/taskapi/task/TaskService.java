@@ -1,14 +1,10 @@
-package com.example.taskapi.service;
+package com.example.taskapi.task;
 
-import com.example.taskapi.dto.TaskRequest;
-import com.example.taskapi.dto.TaskResponse;
-import com.example.taskapi.exception.ResourceNotFoundException;
-import com.example.taskapi.mapper.TaskMapper;
-import com.example.taskapi.model.Task;
-import com.example.taskapi.model.TaskStatus;
-import com.example.taskapi.model.User;
-import com.example.taskapi.repository.TaskRepository;
-import com.example.taskapi.repository.UserRepository;
+import com.example.taskapi.task.dto.TaskRequest;
+import com.example.taskapi.task.dto.TaskResponse;
+import com.example.taskapi.common.exception.ResourceNotFoundException;
+import com.example.taskapi.user.User;
+import com.example.taskapi.user.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
