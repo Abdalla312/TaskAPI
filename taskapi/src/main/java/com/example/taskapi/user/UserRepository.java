@@ -1,6 +1,10 @@
 package com.example.taskapi.user;
 
+import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+    boolean existsUserByEmail(String email);
+
+    boolean existsUserByUsername(String username);
 }

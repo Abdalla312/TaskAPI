@@ -1,8 +1,12 @@
 package com.example.taskapi.task;
 
+import com.example.taskapi.task.dto.TaskResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * JPA repositories go here.
@@ -19,7 +23,7 @@ import java.util.List;
  * TODO (Day 5): Create UserRepository
  */
 public interface TaskRepository extends JpaRepository<Task, Long> {
-    List<Task> findAllByStatus(TaskStatus status);
+    Page<Task> findAllByStatus(TaskStatus status, Pageable pageable);
     //findByTitleContainingIgnoreCase
-    List<Task> findByTitleContainingIgnoreCase(String title);
+    Page<Task> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 }

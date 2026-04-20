@@ -1,6 +1,6 @@
 package com.example.taskapi.user;
 
-
+import com.example.taskapi.common.exception.UserAlreadyExistsException;
 import com.example.taskapi.user.dto.UserRequest;
 import com.example.taskapi.user.dto.UserResponse;
 import com.example.taskapi.common.exception.ResourceNotFoundException;
@@ -25,6 +25,13 @@ public class UserService {
     public UserResponse createUser(UserRequest dto) {
         // from DTO Request -> Entity
         User user = userMapper.toEntity(dto);
+        // check username & email should be unique
+        if (userRepository.existsUserByEmail(user.getEmail())) {
+            throw new UserAlreadyExistsException("Email already exists");
+        }
+        if (userRepository.existsUserByUsername(user.getUsername())) {
+            throw new UserAlreadyExistsException("Username already exists");
+        }
         // save into Entity
         User savedUser = userRepository.save(user);
         // from Entity -> DTO response
@@ -44,7 +51,7 @@ public class UserService {
     @Transactional
     public UserResponse updateUser(Long id, UserRequest dto) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         userMapper.updateEntityFromDto(dto, user);
         return userMapper.toDTO(user);
     }

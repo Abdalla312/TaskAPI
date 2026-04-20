@@ -53,7 +53,7 @@
 - [x] Add `GET /api/tasks/{id}`, `PUT /api/tasks/{id}`, `DELETE /api/tasks/{id}`
 - [x] Use `@PathVariable` for ID extraction
 - [x] Return proper status codes: `200`, `201`, `204`, `404`
-- [ ] Add a simple `TaskNotFoundException` that returns 404
+- [x] Add a simple `TaskNotFoundException` that returns 404
 - [x] **Java you'll learn**: `HashMap`, `Optional`, exceptions, `ResponseEntity`
 
 **Deliverable**: Full CRUD working, tested via Postman/curl ✅
@@ -122,20 +122,20 @@
 ### Day 9: Validation + Error Handling (3 hrs)
 - [x] Add Bean Validation annotations: `@NotBlank`, `@Size`, `@Email` on DTOs
 - [x] Use `@Valid` in controller parameters
-- [ ] Create `GlobalExceptionHandler` with `@ControllerAdvice`
-- [ ] Handle `MethodArgumentNotValidException` → return `400` with field errors
-- [ ] Handle `ResourceNotFoundException` → return `404`
+- [x] Create `GlobalExceptionHandler` with `@ControllerAdvice`
+- [x] Handle `MethodArgumentNotValidException` → return `400` with field errors
+- [x] Handle `ResourceNotFoundException` → return `404`
 - [ ] Handle generic `Exception` → return `500` (never leak stack traces)
 - [x] Consistent error response format: `{ timestamp, status, error, message }`
-- [ ] **Django parallel**: `@ControllerAdvice` ≈ DRF's `exception_handler`. Validation annotations ≈ serializer field validation.
+- [x] **Django parallel**: `@ControllerAdvice` ≈ DRF's `exception_handler`. Validation annotations ≈ serializer field validation.
 
 **Deliverable**: Clean validation errors, consistent error JSON format ✅
 
 ### Day 10: Pagination + Sorting (2 hrs)
-- [ ] Accept `Pageable` in repository and controller
-- [ ] `GET /api/tasks?page=0&size=10&sort=createdAt,desc`
-- [ ] Return `Page<TaskResponse>` with metadata (totalElements, totalPages)
-- [ ] **Django parallel**: This is like DRF's `PageNumberPagination`, but built into Spring Data
+- [x] Accept `Pageable` in repository and controller
+- [x] `GET /api/tasks?page=0&size=10&sort=createdAt,desc`
+- [x] Return `Page<TaskResponse>` with metadata (totalElements, totalPages)
+- [x] **Django parallel**: This is like DRF's `PageNumberPagination`, but built into Spring Data
 
 **Deliverable**: Paginated task list with metadata ✅
 

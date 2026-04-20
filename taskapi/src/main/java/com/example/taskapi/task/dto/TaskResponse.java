@@ -13,6 +13,7 @@ public class TaskResponse {
     private String description;
     private String taskStatus;
     private Long userId;
+    private String username;
     private LocalDateTime updatedAt;
     private LocalDateTime createdAt;
 

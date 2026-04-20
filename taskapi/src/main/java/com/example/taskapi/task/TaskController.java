@@ -1,13 +1,16 @@
 package com.example.taskapi.task;
 
+import com.example.taskapi.common.apiResponse.ApiResponse;
+import com.example.taskapi.common.pagination.PageResponse;
+import com.example.taskapi.common.validation.OnPatch;
 import com.example.taskapi.task.dto.TaskRequest;
 import com.example.taskapi.task.dto.TaskResponse;
-import com.example.taskapi.common.exception.ResourceNotFoundException;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 @RestController
@@ -16,56 +19,64 @@ public class TaskController {
 
     private final TaskService taskService;
 
-    // Constructor injection — Spring sees TaskService is needed and provides it.
-    // Django equivalent: there isn't one. Django uses imports instead of DI.
+
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskResponse>> getAllTasks() {
-        return ResponseEntity.ok(taskService.getAllTasks());
+    public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getAllTasks(Pageable pageable) {
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        taskService.getAllTasks(pageable),
+                        "Success"));
     }
 
     @GetMapping(params = "status")
-    public ResponseEntity<List<TaskResponse>> getTasksByStatus(@RequestParam String status) {
-        return ResponseEntity.ok(taskService.findTasksByStatus(status));
+    public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getTasksByStatus(@RequestParam String status, Pageable pageable) {
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        PageResponse.from(
+                                taskService.findTasksByStatus(status, pageable)),
+                        "success"));
     }
 
     @GetMapping(params = "title")
-    public ResponseEntity<List<TaskResponse>> getTaskByTitle(@RequestParam String title) {
-        return ResponseEntity.ok(taskService.findTaskByTitle(title));
+    public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getTaskByTitle(@RequestParam String title, Pageable pageable) {
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        PageResponse.from(
+                                taskService.findTaskByTitle(title, pageable)),
+                        "success"));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
-        return ResponseEntity.ok(taskService.getTaskById(id));        // not found → 404
+    public ResponseEntity<ApiResponse<TaskResponse>> getTaskById(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                ApiResponse.ok(taskService.getTaskById(id), "success"));
     }
 
     @PostMapping
-    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest task) {
+    public ResponseEntity<ApiResponse<TaskResponse>> createTask(@RequestBody @Validated(OnPatch.class) TaskRequest task) {
         TaskResponse created = taskService.createTask(task);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);  // 201
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ApiResponse.created("success", created));  // 201
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<TaskResponse> updateTask(@PathVariable Long id, @RequestBody TaskRequest task) {
-        return ResponseEntity.ok(taskService.updateTask(id, task));        // not found → 404
+    public ResponseEntity<ApiResponse<TaskResponse>> updateTask(@PathVariable Long id, @RequestBody @Valid TaskRequest task) {
+        return ResponseEntity.ok(ApiResponse.ok(taskService.updateTask(id, task), "success"));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
-        if (taskService.deleteTask(id)) {
-            return ResponseEntity.noContent().build();             // deleted → 204
-        }
-        return ResponseEntity.notFound().build();                  // not found → 404
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();             // deleted -> 204
     }
 
     @PatchMapping("/{id}/assign/{userId}")
-    public ResponseEntity<TaskResponse> assignTaskToUser(@PathVariable Long id, @PathVariable Long userId) {
-        return taskService.assignTaskToUser(id, userId)
-                .map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException("User or Task id not found."));
+    public ResponseEntity<ApiResponse<TaskResponse>> assignTaskToUser(@PathVariable Long id, @PathVariable Long userId) {
+        return ResponseEntity.ok(ApiResponse.ok(taskService.assignTaskToUser(id, userId), "success"));
     }
 
 
