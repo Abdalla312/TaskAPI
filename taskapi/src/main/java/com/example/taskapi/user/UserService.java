@@ -1,14 +1,13 @@
 package com.example.taskapi.user;
 
+import com.example.taskapi.common.exception.ResourceNotFoundException;
 import com.example.taskapi.common.exception.UserAlreadyExistsException;
+import com.example.taskapi.common.pagination.PageResponse;
 import com.example.taskapi.user.dto.UserRequest;
 import com.example.taskapi.user.dto.UserResponse;
-import com.example.taskapi.common.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class UserService {
@@ -16,7 +15,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    @Autowired
     public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
@@ -38,8 +36,10 @@ public class UserService {
         return userMapper.toDTO(savedUser);
     }
 
-    public List<UserResponse> getAllUsers() {
-        return userMapper.toDTO(userRepository.findAll());
+    public PageResponse<UserResponse> getAllUsers(Pageable pageable) {
+        return PageResponse.from(
+                userRepository.findAll(pageable)
+                        .map(userMapper::toDTO));
     }
 
     public UserResponse getUserById(Long id) {

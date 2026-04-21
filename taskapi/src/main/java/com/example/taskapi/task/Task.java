@@ -38,7 +38,7 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TaskStatus status; // TODO (Day 5): Replace with TaskStatus enum
+    private TaskStatus status;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

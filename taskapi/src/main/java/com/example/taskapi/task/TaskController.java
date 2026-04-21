@@ -2,10 +2,12 @@ package com.example.taskapi.task;
 
 import com.example.taskapi.common.apiResponse.ApiResponse;
 import com.example.taskapi.common.pagination.PageResponse;
+import com.example.taskapi.common.validation.OnCreate;
 import com.example.taskapi.common.validation.OnPatch;
 import com.example.taskapi.task.dto.TaskRequest;
 import com.example.taskapi.task.dto.TaskResponse;
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,12 @@ public class TaskController {
         this.taskService = taskService;
     }
 
+    @Operation(summary = "List all tasks")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "success"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "not found"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
+    })
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getAllTasks(Pageable pageable) {
         return ResponseEntity.ok(
@@ -32,6 +40,12 @@ public class TaskController {
                         "Success"));
     }
 
+    @Operation(summary = "Get task by status")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "success"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "not found"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
+    })
     @GetMapping(params = "status")
     public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getTasksByStatus(@RequestParam String status, Pageable pageable) {
         return ResponseEntity.ok(
@@ -41,6 +55,12 @@ public class TaskController {
                         "success"));
     }
 
+    @Operation(summary = "Get task by title")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "success"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "not found"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
+    })
     @GetMapping(params = "title")
     public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getTaskByTitle(@RequestParam String title, Pageable pageable) {
         return ResponseEntity.ok(
@@ -50,30 +70,63 @@ public class TaskController {
                         "success"));
     }
 
+    @Operation(summary = "Get task by id")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "success"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "not found"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<TaskResponse>> getTaskById(@PathVariable Long id) {
         return ResponseEntity.ok(
                 ApiResponse.ok(taskService.getTaskById(id), "success"));
     }
 
+    @Operation(summary = "Create new task")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "success"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "conflict"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
+    })
     @PostMapping
-    public ResponseEntity<ApiResponse<TaskResponse>> createTask(@RequestBody @Validated(OnPatch.class) TaskRequest task) {
-        TaskResponse created = taskService.createTask(task);
+    public ResponseEntity<ApiResponse<TaskResponse>> createTask(@RequestBody @Validated(OnCreate.class) TaskRequest task) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.created("success", created));  // 201
+                ApiResponse.created(taskService.createTask(task),
+                        "success"));  // 201
     }
 
+    @Operation(summary = "Patch task by id")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "success"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "not found"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
+    })
     @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<TaskResponse>> updateTask(@PathVariable Long id, @RequestBody @Valid TaskRequest task) {
-        return ResponseEntity.ok(ApiResponse.ok(taskService.updateTask(id, task), "success"));
+    public ResponseEntity<ApiResponse<TaskResponse>> updateTask(@PathVariable Long id, @RequestBody @Validated(OnPatch.class) TaskRequest task) {
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        taskService.updateTask(id, task),
+                        "success"));
     }
 
+    @Operation(summary = "Delete task by id")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "success"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "not found"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
         return ResponseEntity.noContent().build();             // deleted -> 204
     }
 
+    @Operation(summary = "Assign task by id to user")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "success"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "not found"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
+    })
     @PatchMapping("/{id}/assign/{userId}")
     public ResponseEntity<ApiResponse<TaskResponse>> assignTaskToUser(@PathVariable Long id, @PathVariable Long userId) {
         return ResponseEntity.ok(ApiResponse.ok(taskService.assignTaskToUser(id, userId), "success"));

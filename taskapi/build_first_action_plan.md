@@ -125,7 +125,7 @@
 - [x] Create `GlobalExceptionHandler` with `@ControllerAdvice`
 - [x] Handle `MethodArgumentNotValidException` → return `400` with field errors
 - [x] Handle `ResourceNotFoundException` → return `404`
-- [ ] Handle generic `Exception` → return `500` (never leak stack traces)
+- [x] Handle generic `Exception` → return `500` (never leak stack traces)
 - [x] Consistent error response format: `{ timestamp, status, error, message }`
 - [x] **Django parallel**: `@ControllerAdvice` ≈ DRF's `exception_handler`. Validation annotations ≈ serializer field validation.
 
@@ -140,11 +140,12 @@
 **Deliverable**: Paginated task list with metadata ✅
 
 ### Day 11: Logging + API Docs (2 hrs)
-- [ ] Add SLF4J logging in service layer: `log.info()`, `log.error()`
-- [ ] Add SpringDoc/OpenAPI dependency
-- [ ] Access Swagger UI at `http://localhost:8080/swagger-ui.html`
-- [ ] Add `@Operation` and `@ApiResponse` annotations for documentation
-- [ ] **Django parallel**: SpringDoc ≈ DRF's browsable API / drf-spectacular
+
+- [x] Add SLF4J logging in service layer: `log.info()`, `log.error()`
+- [x] Add SpringDoc/OpenAPI dependency
+- [x] Access Swagger UI at `http://localhost:8080/swagger-ui.html`
+- [x] Add `@Operation` and `@ApiResponse` annotations for documentation
+- [x] **Django parallel**: SpringDoc ≈ DRF's browsable API / drf-spectacular
 
 **Deliverable**: API documented with Swagger UI ✅
 
