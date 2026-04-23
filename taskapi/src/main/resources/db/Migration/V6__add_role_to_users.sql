@@ -1,0 +1,11 @@
+ALTER TABLE users
+    ADD role VARCHAR(15);
+
+ALTER TABLE users
+    ALTER COLUMN role SET NOT NULL;
+
+ALTER TABLE tasks
+    ALTER COLUMN status SET NOT NULL;
+
+ALTER TABLE tasks
+    ALTER COLUMN title SET NOT NULL;

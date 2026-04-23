@@ -156,7 +156,7 @@
 **Goal**: Add JWT auth, write tests, make it interview-ready.
 
 ### Day 12: Spring Security Basics (3 hrs)
-- [ ] Add Spring Security + JWT dependencies
+- [x] Add Spring Security + JWT dependencies
 - [ ] Create `AuthController` with `POST /api/auth/register` and `POST /api/auth/login`
 - [ ] Hash passwords with `BCryptPasswordEncoder`
 - [ ] Generate JWT on successful login
