@@ -1,46 +1,255 @@
 ﻿# Task API
 
-Task Management REST API built with Spring Boot.
+A production-ready Task Management REST API built with Spring Boot 3.2, featuring JWT authentication, role-based access control, database migrations with Flyway, and comprehensive OpenAPI/Swagger documentation.
+
+## Overview
+
+This project demonstrates a well-structured Spring Boot application with:
+- **RESTful API** for managing tasks and users
+- **JWT-based Authentication** (JJWT 0.12.7)
+- **Role-based Authorization** 
+- **Database Migrations** using Flyway
+- **API Documentation** via SpringDoc OpenAPI/Swagger UI
+- **Input Validation** with Bean Validation (Jakarta)
+- **Object Mapping** with MapStruct
+- **Pagination Support** for list endpoints
 
 ## Tech Stack
 
-- Java 17
-- Spring Boot 3.2
-- Spring Web
-- Spring Data JPA
-- Spring Security
-- Flyway
-- PostgreSQL
-- Bean Validation
-- JUnit 5 + Mockito
+| Component | Technology |
+|-----------|-----------|
+| **Language** | Java 17 |
+| **Framework** | Spring Boot 3.2.4 |
+| **Database** | PostgreSQL |
+| **ORM** | Spring Data JPA (Hibernate) |
+| **Security** | Spring Security + JWT (JJWT 0.12.7) |
+| **Migrations** | Flyway DB |
+| **Mapping** | MapStruct 1.6.3 |
+| **API Docs** | SpringDoc OpenAPI 2.5.0 |
+| **Validation** | Jakarta Bean Validation |
+| **Build** | Maven 3.11.0 |
+| **Testing** | JUnit 5 + Mockito |
+| **Utilities** | Lombok 1.18.32 |
 
 ## Project Structure
 
+```
 src/main/java/com/example/taskapi/
-- auth/
-- common/
-- config/
-- task/
-- user/
-- TaskApiApplication.java
+├── TaskApiApplication.java      # Application entry point
+├── auth/                         # Authentication endpoints
+├── common/                       # Shared components
+│   ├── HealthController.java    # Health check endpoint
+│   ├── apiResponse/             # API response wrappers
+│   ├── dto/                     # Data transfer objects
+│   ├── exception/               # Exception handlers
+│   ├── pagination/              # Pagination support
+│   └── validation/              # Custom validation groups
+├── config/                      # Spring configuration
+├── task/                        # Task management module
+│   ├── TaskController.java      # Task endpoints
+│   ├── TaskService.java         # Business logic
+│   ├── TaskRepository.java      # Database access
+│   ├── TaskMapper.java          # DTO mapping
+│   ├── Task.java                # Entity model
+│   ├── TaskStatus.java          # Status enum
+│   └── dto/                     # Task DTOs
+└── user/                        # User management module
+    ├── UserController.java      # User endpoints
+    ├── UserService.java         # Business logic
+    ├── UserRepository.java      # Database access
+    ├── UserMapper.java          # DTO mapping
+    ├── User.java                # Entity model
+    ├── Role.java                # Role enum
+    └── dto/                     # User DTOs
+```
+
+## API Endpoints
+
+### Health Check
+- `GET /api/health` - Check API status
+
+### Tasks
+- `GET /api/tasks` - List all tasks (paginated)
+- `GET /api/tasks/{id}` - Get task by ID
+- `GET /api/tasks?status=PENDING` - Filter tasks by status
+- `GET /api/tasks?title=Example` - Search tasks by title
+- `POST /api/tasks` - Create new task
+- `PATCH /api/tasks/{id}` - Update task
+- `DELETE /api/tasks/{id}` - Delete task
+- `PATCH /api/tasks/{id}/assign/{userId}` - Assign task to user
+
+### Users
+- `GET /api/users` - List all users (paginated)
+- `GET /api/users/{id}` - Get user by ID
+- `POST /api/users` - Create new user
+- `PATCH /api/users/{id}` - Update user
+- `DELETE /api/users/{id}` - Delete user
 
 ## Quick Start
 
-1. Ensure Java 17+ and Maven are installed:
-   - java -version
-   - mvn -v
-2. Configure database and environment values as needed.
-3. Run the app from repository root:
-   - mvn spring-boot:run
-4. Health check:
-   - GET http://localhost:8000/api/health
+### Prerequisites
+- Java 17 or higher
+- Maven 3.6+
+- PostgreSQL 12+
+- Git
 
-## API Docs
+### Installation & Setup
 
-- Swagger UI: http://localhost:8000/swagger-ui/index.html
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd TaskAPI
+   ```
 
-## Why This Repo Is Public-Ready
+2. **Verify prerequisites:**
+   ```bash
+   java -version          # Verify Java 17+
+   mvn -v                 # Verify Maven
+   ```
 
-- Single focused project (Task API only)
-- Clean structure and commit history
-- No unrelated practice folders or generated build artifacts tracked
+3. **Configure database:**
+   - Create PostgreSQL database:
+     ```sql
+     CREATE DATABASE taskapi_db;
+     ```
+   - Set environment variables (or modify `application.yml`):
+     ```bash
+     export DB_USERNAME=postgres
+     export DB_PASSWORD=your_password
+     ```
+
+4. **Build the project:**
+   ```bash
+   mvn clean install
+   ```
+
+5. **Run the application:**
+   ```bash
+   mvn spring-boot:run
+   ```
+   The API will start on `http://localhost:8000`
+
+### Verify Installation
+
+```bash
+# Health check
+curl http://localhost:8000/api/health
+
+# Expected response:
+{
+  "status": "UP",
+  "timestamp": "2026-04-23T12:00:00",
+  "message": "Task API is running! 🚀"
+}
+```
+
+## API Documentation
+
+Access the interactive Swagger UI:
+- **Swagger UI:** http://localhost:8000/swagger-ui/index.html
+- **OpenAPI JSON:** http://localhost:8000/v3/api-docs
+
+## Database Migrations
+
+Migrations are managed with Flyway and located in `src/main/resources/db/Migration/`:
+- `V1__create_users_table.sql` - Users table
+- `V2__create_tasks_table.sql` - Tasks table
+- `V3__fix_tasks_columns.sql` - Column adjustments
+- `V4__align_tasks_schema_with_jpa.sql` - JPA alignment
+- `V5__alter_userid_foreign_key_to_nullable.sql` - Foreign key adjustment
+- `V6__add_role_to_users.sql` - Role support
+
+Migrations run automatically on application startup.
+
+## Configuration
+
+Key settings in `src/main/resources/application.yml`:
+- **Server port:** 8000
+- **Database driver:** PostgreSQL
+- **JPA dialect:** Hibernate with PostgreSQL support
+- **Hibernate DDL:** validate (schema validation only)
+- **Flyway:** enabled with automatic migration
+
+## Development
+
+### Build & Test
+```bash
+# Build project
+mvn clean package
+
+# Run tests
+mvn test
+
+# Run with debug
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
+```
+
+### Key Dependencies
+- **Spring Boot Starters:** Web, Data JPA, Security, Validation
+- **PostgreSQL Driver:** runtime scope
+- **JJWT:** JWT token generation and validation
+- **MapStruct:** Type-safe object mapping
+- **SpringDoc OpenAPI:** API documentation generation
+- **Lombok:** Boilerplate reduction
+
+## Features
+
+✅ **RESTful API Design** - Clean endpoint structure with proper HTTP methods and status codes
+✅ **JWT Authentication** - Secure token-based authentication
+✅ **Role-Based Access Control** - User roles support (ADMIN, USER, etc.)
+✅ **Pagination** - Efficient handling of large datasets
+✅ **Input Validation** - Comprehensive request validation
+✅ **Error Handling** - Centralized exception handling with meaningful error responses
+✅ **Database Migrations** - Version-controlled schema changes
+✅ **API Documentation** - Auto-generated and interactive Swagger UI
+✅ **Type-Safe Mapping** - MapStruct for DTOs
+✅ **Security Best Practices** - Spring Security configuration
+
+## Example Requests
+
+### Create a User
+```bash
+curl -X POST http://localhost:8000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "secure_password",
+    "role": "USER"
+  }'
+```
+
+### Create a Task
+```bash
+curl -X POST http://localhost:8000/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Complete project documentation",
+    "description": "Write comprehensive docs",
+    "status": "PENDING",
+    "priority": "HIGH"
+  }'
+```
+
+### Assign Task to User
+```bash
+curl -X PATCH http://localhost:8000/api/tasks/1/assign/1 \
+  -H "Content-Type: application/json"
+```
+
+## Why This Project
+
+- **Production-Ready:** Follows Spring Boot best practices and clean architecture principles
+- **Well-Structured:** Clear separation of concerns with dedicated modules
+- **Maintainable:** Type-safe mapping, dependency injection, and comprehensive configuration
+- **Scalable:** Pagination, proper ORM usage, and database migrations
+- **Documented:** OpenAPI/Swagger integration for API exploration
+- **Secure:** JWT authentication and role-based access control
+
+## License
+
+This project is open source and available under the MIT License.
+
+## Author
+
+Built with ❤️ as a Spring Boot learning project demonstrating production-ready patterns and best practices.
