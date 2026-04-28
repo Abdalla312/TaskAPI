@@ -22,7 +22,7 @@ This project demonstrates a well-structured Spring Boot application with:
 | **Framework** | Spring Boot 3.2.4 |
 | **Database** | PostgreSQL |
 | **ORM** | Spring Data JPA (Hibernate) |
-| **Security** | Spring Security + JWT (JJWT 0.12.7) |
+| **Security** | Spring Security + JWT (JJWT 0.12.6 & 0.12.7) |
 | **Migrations** | Flyway DB |
 | **Mapping** | MapStruct 1.6.3 |
 | **API Docs** | SpringDoc OpenAPI 2.5.0 |
@@ -65,10 +65,14 @@ src/main/java/com/example/taskapi/
 
 ## API Endpoints
 
-### Health Check
-- `GET /api/health` - Check API status
+### Authentication (Public)
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login and receive JWT token
 
-### Tasks
+### Health Check
+- `GET /actuator/health` - Check API status
+
+### Tasks (Protected)
 - `GET /api/tasks` - List all tasks (paginated)
 - `GET /api/tasks/{id}` - Get task by ID
 - `GET /api/tasks?status=PENDING` - Filter tasks by status
@@ -78,12 +82,35 @@ src/main/java/com/example/taskapi/
 - `DELETE /api/tasks/{id}` - Delete task
 - `PATCH /api/tasks/{id}/assign/{userId}` - Assign task to user
 
-### Users
+### Users (Protected)
 - `GET /api/users` - List all users (paginated)
 - `GET /api/users/{id}` - Get user by ID
 - `POST /api/users` - Create new user
 - `PATCH /api/users/{id}` - Update user
 - `DELETE /api/users/{id}` - Delete user
+
+## Authentication & Security
+
+### JWT Authentication
+
+All endpoints except `/api/auth/*` are **protected** and require JWT authentication. After login/registration, include the JWT token in the `Authorization` header:
+
+```bash
+curl -H "Authorization: Bearer <your_jwt_token>" http://localhost:8000/api/tasks
+```
+
+### Roles
+
+The application supports the following user roles:
+- **ADMIN** - Administrative privileges
+- **USER** - Standard user privileges (default)
+
+### How JWT Works
+
+1. User registers via `POST /api/auth/register` or logs in via `POST /api/auth/login`
+2. API returns a JWT token in the response
+3. Client includes token in subsequent requests in the `Authorization: Bearer <token>` header
+4. Server validates the token before processing the request
 
 ## Quick Start
 
@@ -107,15 +134,19 @@ src/main/java/com/example/taskapi/
    mvn -v                 # Verify Maven
    ```
 
-3. **Configure database:**
+3. **Configure database and security:**
    - Create PostgreSQL database:
      ```sql
      CREATE DATABASE taskapi_db;
      ```
-   - Set environment variables (or modify `application.yml`):
+   - Set environment variables (add to `.env` or export):
      ```bash
+     # Database configuration (optional - defaults to postgres/postgres)
      export DB_USERNAME=postgres
      export DB_PASSWORD=your_password
+     
+     # JWT secret (REQUIRED - generate a strong secret key)
+     export JWT_SECRET=your-secret-key-here-minimum-32-characters-recommended
      ```
 
 4. **Build the project:**
@@ -133,12 +164,12 @@ src/main/java/com/example/taskapi/
 
 ```bash
 # Health check
-curl http://localhost:8000/api/health
+curl http://localhost:8000/actuator/health
 
 # Expected response:
 {
   "status": "UP",
-  "timestamp": "2026-04-23T12:00:00",
+  "timestamp": "2026-04-28T12:00:00",
   "message": "Task API is running! 🚀"
 }
 ```
@@ -165,10 +196,40 @@ Migrations run automatically on application startup.
 
 Key settings in `src/main/resources/application.yml`:
 - **Server port:** 8000
-- **Database driver:** PostgreSQL
-- **JPA dialect:** Hibernate with PostgreSQL support
-- **Hibernate DDL:** validate (schema validation only)
-- **Flyway:** enabled with automatic migration
+- **Database:** PostgreSQL (configurable via `DB_USERNAME` and `DB_PASSWORD` env vars)
+- **JPA Hibernate DDL:** `validate` (schema validation only - depends on Flyway migrations)
+- **Flyway:** Enabled with automatic migration on startup
+- **JWT Secret:** Must be set via `JWT_SECRET` environment variable (no default value)
+
+### Required Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `JWT_SECRET` | Secret key for JWT token signing | `my-super-secret-key` |
+| `DB_USERNAME` | PostgreSQL username | `postgres` |
+| `DB_PASSWORD` | PostgreSQL password | `your_password` |
+
+## Data Models
+
+### Task
+- **id** (Long) - Primary key, auto-generated
+- **title** (String) - Task title, required, max 50 characters
+- **description** (String) - Task description, required, long text
+- **status** (TaskStatus) - Task status, required - Valid values: `TODO`, `PENDING`, `IN_PROGRESS`, `COMPLETED`
+- **user_id** (Long) - Foreign key to assigned user, nullable
+- **created_at** (LocalDateTime) - Auto-set on creation, not updatable
+- **updated_at** (LocalDateTime) - Auto-updated on any modification
+- **Index:** On `status` column for efficient filtering
+
+### User
+- **id** (Long) - Primary key, auto-generated
+- **username** (String) - Unique username, required, max 50 characters
+- **email** (String) - Unique email, required
+- **password** (String) - Bcrypt-hashed password, required, write-only in responses
+- **role** (Role) - User role, required - Valid values: `ADMIN`, `USER` (default)
+- **created_at** (LocalDateTime) - Auto-set on creation, not updatable
+- **updated_at** (LocalDateTime) - Auto-updated on any modification
+- **Relationship:** One-to-many with Tasks (cascade delete)
 
 ## Development
 
@@ -207,34 +268,78 @@ mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=
 
 ## Example Requests
 
-### Create a User
+### Register a New User
 ```bash
-curl -X POST http://localhost:8000/api/users \
+curl -X POST http://localhost:8000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "username": "john_doe",
     "email": "john@example.com",
-    "password": "secure_password",
-    "role": "USER"
+    "password": "secure_password"
   }'
+
+# Response:
+{
+  "data": {
+    "id": 1,
+    "username": "john_doe",
+    "email": "john@example.com",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  },
+  "message": "Registered successfully",
+  "timestamp": "2026-04-28T12:00:00"
+}
+```
+
+### Login
+```bash
+curl -X POST http://localhost:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "john_doe",
+    "password": "secure_password"
+  }'
+
+# Response:
+{
+  "data": {
+    "id": 1,
+    "username": "john_doe",
+    "email": "john@example.com",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  },
+  "message": "Login successful",
+  "timestamp": "2026-04-28T12:00:00"
+}
 ```
 
 ### Create a Task
 ```bash
+# Note: Replace <token> with the JWT token received from login/register
 curl -X POST http://localhost:8000/api/tasks \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
   -d '{
     "title": "Complete project documentation",
-    "description": "Write comprehensive docs",
-    "status": "PENDING",
-    "priority": "HIGH"
+    "description": "Write comprehensive docs and examples",
+    "status": "TODO"
   }'
+
+# Valid status values: TODO, PENDING, IN_PROGRESS, COMPLETED
 ```
 
-### Assign Task to User
+### Create a User
 ```bash
-curl -X PATCH http://localhost:8000/api/tasks/1/assign/1 \
-  -H "Content-Type: application/json"
+# Note: Replace <token> with the JWT token received from login/register
+curl -X POST http://localhost:8000/api/users \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "username": "jane_smith",
+    "email": "jane@example.com",
+    "password": "another_secure_password",
+    "role": "USER"
+  }'
 ```
 
 ## Why This Project

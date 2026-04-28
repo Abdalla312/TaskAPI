@@ -1,26 +1,37 @@
 package com.example.taskapi.auth;
 
 import com.example.taskapi.common.apiResponse.ApiResponse;
-import com.example.taskapi.user.dto.UserRequest;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    //TODO: Add /register route mapping
-//    @GetMapping("/register")
-//    public ResponseEntity<ApiResponse<AuthResponse>> register(@RequestBody @ValidUserRequest userRequest){
-//        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created(_,_));
+    private final AuthService authService;
 
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<AuthResponse>> register(
+            @RequestBody @Valid RegisterRequest request) {
+        AuthResponse response = authService.register(request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.created(response,
+                        "Registered successfully"));
     }
 
-    //TODO: Configure /login route mapping
-//    @GetMapping("/login")
-//    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody @Valid UserDetails userDetails)
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody @Valid AuthRequest request) {
+        AuthResponse response = authService.login(request);
+        return ResponseEntity.ok(ApiResponse.ok(response, "Login successful"));
+    }
 
 }

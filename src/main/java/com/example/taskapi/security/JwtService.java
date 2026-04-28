@@ -27,16 +27,16 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(JwtClaims claims, UserDetails userDetails) {
-        Date now = new Date();
-        Date expiry = new Date(System.currentTimeMillis() + 86400000);
+    public String generateToken(CustomUserDetails userDetails) {
+        String role = userDetails
+                .getAuthorities().iterator().next().getAuthority();
 
         return Jwts.builder()
                 .subject(userDetails.getUsername())
-                .claim("userId", claims.getUserId())
-                .claim("role", claims.getRole())
-                .issuedAt(now)
-                .expiration(expiry)
+                .claim("userId", userDetails.getUserId())
+                .claim("role", role)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 86400000))
                 .signWith(getSignInKey())
                 .compact();
     }
