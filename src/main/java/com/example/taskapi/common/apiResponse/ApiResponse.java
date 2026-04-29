@@ -27,7 +27,6 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> created(T data, String message) {
-
         return new ApiResponse<>(201, message, data);
     }
 

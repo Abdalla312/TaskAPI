@@ -7,6 +7,7 @@ import com.example.taskapi.user.dto.UserRequest;
 import com.example.taskapi.user.dto.UserResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,26 +15,16 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserResponse createUser(UserRequest dto) {
-        // from DTO Request -> Entity
-        User user = userMapper.toEntity(dto);
-        // check username & email should be unique
-        if (userRepository.existsUserByEmail(user.getEmail())) {
-            throw new UserAlreadyExistsException("Email already exists");
-        }
-        if (userRepository.existsUserByUsername(user.getUsername())) {
-            throw new UserAlreadyExistsException("Username already exists");
-        }
-        // save into Entity
-        User savedUser = userRepository.save(user);
-        // from Entity -> DTO response
-        return userMapper.toDTO(savedUser);
+        return userMapper.toDTO(saveNewUser(dto));
     }
 
     public PageResponse<UserResponse> getAllUsers(Pageable pageable) {
@@ -61,5 +52,22 @@ public class UserService {
         userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         userRepository.deleteById(id);
+    }
+
+    public User saveNewUser(UserRequest dto) {
+        // from DTO Request -> Entity
+        User user = userMapper.toEntity(dto);
+        // check username & email should be unique
+        if (userRepository.existsUserByEmail(user.getEmail())) {
+            throw new UserAlreadyExistsException("Email already exists");
+        }
+        if (userRepository.existsUserByUsername(user.getUsername())) {
+            throw new UserAlreadyExistsException("Username already exists");
+        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(Role.USER);
+        // save into Entity
+
+        return userRepository.save(user);
     }
 }
