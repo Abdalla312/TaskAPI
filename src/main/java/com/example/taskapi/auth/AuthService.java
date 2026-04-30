@@ -20,6 +20,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final UserService userService;
     private final UserMapper userMapper;
+    private final RefreshTokenService refreshTokenService;
 
 
     public AuthResponse login(AuthRequest authRequest) {
@@ -35,8 +36,9 @@ public class AuthService {
         String role = userDetails.getAuthorities().iterator().next().getAuthority();
 
         String jwtToken = jwtService.generateToken(userDetails);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUser());
 
-        return new AuthResponse(jwtToken, userDetails.getUsername(), role);
+        return new AuthResponse(jwtToken, refreshToken.getToken(), userDetails.getUsername(), role);
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -48,7 +50,21 @@ public class AuthService {
         String role = userDetails.getAuthorities().iterator().next().getAuthority();
 
         String token = jwtService.generateToken(userDetails);
-
-        return new AuthResponse(token, savedUser.getUsername(), role);
+        String refreshToken = refreshTokenService.createRefreshToken(savedUser).getToken();
+        return new AuthResponse(token, refreshToken, savedUser.getUsername(), role);
+    }
+    public AuthResponse refresh(RefreshRequest request) {
+        //verify token get user
+        RefreshToken verifiedToken = refreshTokenService.verifyToken(request.getRefreshToken());
+        User user = verifiedToken.getUser();
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        // generate new token
+        String newJwt = jwtService.generateToken(userDetails);
+        String role = userDetails.getAuthorities().iterator().next().getAuthority();
+        // revoke old then issue new one
+        return new AuthResponse(newJwt, null, user.getUsername(), role);
+    }
+    public void logout(RefreshRequest request){
+        refreshTokenService.revokeToken(request.getRefreshToken());
     }
 }

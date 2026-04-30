@@ -18,6 +18,9 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 
+    @Value("${jwt.access-token-expiry}")
+    private long ACCESS_TOKEN_EXPIRY;
+
     public String extractUserName(String jwtToken) {
         return extractClaim(jwtToken, Claims::getSubject);
     }
@@ -36,7 +39,7 @@ public class JwtService {
                 .claim("userId", userDetails.getUserId())
                 .claim("role", role)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 86400000))
+                .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRY))
                 .signWith(getSignInKey())
                 .compact();
     }

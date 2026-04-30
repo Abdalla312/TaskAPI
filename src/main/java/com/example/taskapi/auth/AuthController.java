@@ -1,6 +1,7 @@
 package com.example.taskapi.auth;
 
 import com.example.taskapi.common.apiResponse.ApiResponse;
+import com.example.taskapi.auth.RefreshRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,13 +26,24 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.created(response,
-                        "Registered successfully"));
+                        "success"));
     }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody @Valid AuthRequest request) {
         AuthResponse response = authService.login(request);
-        return ResponseEntity.ok(ApiResponse.ok(response, "Login successful"));
+        return ResponseEntity.ok(ApiResponse.ok(response, "success"));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<AuthResponse>> refresh(@RequestBody @Valid RefreshRequest request) {
+        AuthResponse response = authService.refresh(request);
+        return ResponseEntity.ok(ApiResponse.ok(response, "success"));
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<String>> logout(@RequestBody @Valid RefreshRequest request) {
+        authService.logout(request);
+        return ResponseEntity.ok(ApiResponse.ok("Logged out successfully", "success"));
     }
 
 }
