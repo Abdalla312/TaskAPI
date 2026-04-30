@@ -1,0 +1,17 @@
+# Auto-normalize text files
+* text=auto
+# Force LF for common source and config files
+*.java text eol=lf
+*.kt text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sql text eol=lf
+*.md text eol=lf
+*.properties text eol=lf
+*.gradle text eol=lf
+*.sh text eol=lf
+# Binary files
+*.png binary
+*.jpg binary
+*.jar binary
