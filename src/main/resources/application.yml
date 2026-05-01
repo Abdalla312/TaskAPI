@@ -35,7 +35,7 @@ spring:
     table: flyway_schema_history
 
     # Baseline on migrate for existing database
-    baseline-on-migrate: false
+    baseline-on-migrate: true
 
     # Validate migrations startup
     validate-on-migrate: true

@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
 
 
+    @Transactional
     public AuthResponse login(AuthRequest authRequest) {
 
         Authentication auth = authenticationManager.authenticate(
@@ -41,6 +43,7 @@ public class AuthService {
         return new AuthResponse(jwtToken, refreshToken.getToken(), userDetails.getUsername(), role);
     }
 
+    @Transactional
     public AuthResponse register(RegisterRequest request) {
 
         UserRequest userRequest = userMapper.toUserRequest(request);
@@ -53,6 +56,7 @@ public class AuthService {
         String refreshToken = refreshTokenService.createRefreshToken(savedUser).getToken();
         return new AuthResponse(token, refreshToken, savedUser.getUsername(), role);
     }
+    @Transactional
     public AuthResponse refresh(RefreshRequest request) {
         //verify token get user
         RefreshToken verifiedToken = refreshTokenService.verifyToken(request.getRefreshToken());
@@ -64,6 +68,7 @@ public class AuthService {
         // revoke old then issue new one
         return new AuthResponse(newJwt, null, user.getUsername(), role);
     }
+    @Transactional
     public void logout(RefreshRequest request){
         refreshTokenService.revokeToken(request.getRefreshToken());
     }
