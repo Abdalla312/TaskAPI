@@ -1,5 +1,9 @@
 package com.example.taskapi.auth;
 
+import com.example.taskapi.auth.dto.AuthRequest;
+import com.example.taskapi.auth.dto.AuthResponse;
+import com.example.taskapi.auth.dto.RefreshRequest;
+import com.example.taskapi.auth.dto.RegisterRequest;
 import com.example.taskapi.security.CustomUserDetails;
 import com.example.taskapi.security.JwtService;
 import com.example.taskapi.user.User;

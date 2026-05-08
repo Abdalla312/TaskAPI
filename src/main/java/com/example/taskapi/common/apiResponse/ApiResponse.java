@@ -38,6 +38,14 @@ public class ApiResponse<T> {
         return error(400, message);
     }
 
+    public static <T> ApiResponse<T> unauthorized(String message) {
+        return error(401, message);
+    }
+
+    public static <T> ApiResponse<T> accessDenied(String message) {
+        return error(403, message);
+    }
+
     public static <T> ApiResponse<T> notFound(String message) {
         return error(404, message);
     }

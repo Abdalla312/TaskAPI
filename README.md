@@ -16,20 +16,20 @@ This project demonstrates a well-structured Spring Boot application with:
 
 ## Tech Stack
 
-| Component | Technology |
-|-----------|-----------|
-| **Language** | Java 17 |
-| **Framework** | Spring Boot 3.2.4 |
-| **Database** | PostgreSQL |
-| **ORM** | Spring Data JPA (Hibernate) |
-| **Security** | Spring Security + JWT (JJWT 0.12.6 & 0.12.7) |
-| **Migrations** | Flyway DB |
-| **Mapping** | MapStruct 1.6.3 |
-| **API Docs** | SpringDoc OpenAPI 2.5.0 |
-| **Validation** | Jakarta Bean Validation |
-| **Build** | Maven 3.11.0 |
-| **Testing** | JUnit 5 + Mockito |
-| **Utilities** | Lombok 1.18.32 |
+| Component      | Technology                                   |
+|----------------|----------------------------------------------|
+| **Language**   | Java 21                                      |
+| **Framework**  | Spring Boot 3.2.4                            |
+| **Database**   | PostgreSQL                                   |
+| **ORM**        | Spring Data JPA (Hibernate)                  |
+| **Security**   | Spring Security + JWT (JJWT 0.12.6 & 0.12.7) |
+| **Migrations** | Flyway DB                                    |
+| **Mapping**    | MapStruct 1.6.3                              |
+| **API Docs**   | SpringDoc OpenAPI 2.5.0                      |
+| **Validation** | Jakarta Bean Validation                      |
+| **Build**      | Maven 3.11.0                                 |
+| **Testing**    | JUnit 5 + Mockito                            |
+| **Utilities**  | Lombok 1.18.32                               |
 
 ## Project Structure
 
@@ -68,6 +68,7 @@ src/main/java/com/example/taskapi/
 ### Authentication (Public)
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Login and receive JWT token
+- `POST /api/auth/refresh` - Refresh token request
 
 ### Health Check
 - `GET /actuator/health` - Check API status
@@ -80,7 +81,6 @@ src/main/java/com/example/taskapi/
 - `POST /api/tasks` - Create new task
 - `PATCH /api/tasks/{id}` - Update task
 - `DELETE /api/tasks/{id}` - Delete task
-- `PATCH /api/tasks/{id}/assign/{userId}` - Assign task to user
 
 ### Users (Protected)
 - `GET /api/users` - List all users (paginated)
@@ -115,7 +115,7 @@ The application supports the following user roles:
 ## Quick Start
 
 ### Prerequisites
-- Java 17 or higher
+- Java 21 or higher
 - Maven 3.6+
 - PostgreSQL 12+
 - Git
@@ -203,11 +203,11 @@ Key settings in `src/main/resources/application.yml`:
 
 ### Required Environment Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `JWT_SECRET` | Secret key for JWT token signing | `my-super-secret-key` |
-| `DB_USERNAME` | PostgreSQL username | `postgres` |
-| `DB_PASSWORD` | PostgreSQL password | `your_password` |
+| Variable      | Description                      | Example               |
+|---------------|----------------------------------|-----------------------|
+| `JWT_SECRET`  | Secret key for JWT token signing | `my-super-secret-key` |
+| `DB_USERNAME` | PostgreSQL username              | `postgres`            |
+| `DB_PASSWORD` | PostgreSQL password              | `your_password`       |
 
 ## Data Models
 
@@ -215,7 +215,7 @@ Key settings in `src/main/resources/application.yml`:
 - **id** (Long) - Primary key, auto-generated
 - **title** (String) - Task title, required, max 50 characters
 - **description** (String) - Task description, required, long text
-- **status** (TaskStatus) - Task status, required - Valid values: `TODO`, `PENDING`, `IN_PROGRESS`, `COMPLETED`
+- **status** (TaskStatus) - Task status, required - Valid values: `TODO`, `IN_PROGRESS`, `DONE`
 - **user_id** (Long) - Foreign key to assigned user, nullable
 - **created_at** (LocalDateTime) - Auto-set on creation, not updatable
 - **updated_at** (LocalDateTime) - Auto-updated on any modification

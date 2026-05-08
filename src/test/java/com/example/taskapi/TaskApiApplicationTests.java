@@ -8,7 +8,6 @@ class TaskApiApplicationTests {
 
     @Test
     void contextLoads() {
-        // This test just verifies the application starts up without errors.
-        // Django equivalent: python manage.py check
+
     }
 }

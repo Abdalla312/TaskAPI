@@ -6,13 +6,17 @@ import com.example.taskapi.common.pagination.PageResponse;
 import com.example.taskapi.user.dto.UserRequest;
 import com.example.taskapi.user.dto.UserResponse;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -24,16 +28,20 @@ public class UserService {
     }
 
     public UserResponse createUser(UserRequest dto) {
+        log.info("Create user requested: username={}", dto.getUsername());
         return userMapper.toDTO(saveNewUser(dto));
     }
 
     public PageResponse<UserResponse> getAllUsers(Pageable pageable) {
+
+        log.debug("Fetching all users requested.");
         return PageResponse.from(
                 userRepository.findAll(pageable)
                         .map(userMapper::toDTO));
     }
 
     public UserResponse getUserById(Long id) {
+        log.debug("Fetch user with id={}", id);
         return userRepository.findById(id)
                 .map(userMapper::toDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -41,8 +49,11 @@ public class UserService {
 
     @Transactional
     public UserResponse updateUser(Long id, UserRequest dto) {
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        log.debug("Update user from {} to {} ", user, userMapper.toEntity(dto));
+
         userMapper.updateEntityFromDto(dto, user);
         return userMapper.toDTO(user);
     }
@@ -69,5 +80,13 @@ public class UserService {
         // save into Entity
 
         return userRepository.save(user);
+    }
+
+    public UserResponse setAdmin(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("Invalid user Id"));
+        user.setRole(Role.ADMIN);
+        userRepository.save(user);
+        log.info("Updated user: {} role to ADMIN", id);
+        return userMapper.toDTO(user);
     }
 }

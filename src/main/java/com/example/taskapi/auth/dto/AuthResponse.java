@@ -1,4 +1,4 @@
-package com.example.taskapi.auth;
+package com.example.taskapi.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

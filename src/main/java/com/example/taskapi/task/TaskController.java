@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,12 +33,23 @@ public class TaskController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "not found"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
     })
-    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin-all")
     public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getAllTasks(Pageable pageable) {
         return ResponseEntity.ok(
                 ApiResponse.ok(
                         taskService.getAllTasks(pageable),
-                        "Success"));
+                        "success"));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getAllTasksByUser(Pageable pageable) {
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        taskService.getAllUserTasks(pageable),
+                        "success"
+                )
+        );
     }
 
     @Operation(summary = "Get task by status")
@@ -89,9 +101,9 @@ public class TaskController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
     })
     @PostMapping
-    public ResponseEntity<ApiResponse<TaskResponse>> createTask(@RequestBody @Validated(OnCreate.class) TaskRequest task) {
+    public ResponseEntity<ApiResponse<TaskResponse>> createTask(@RequestBody @Validated(OnCreate.class) TaskRequest taskRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.created(taskService.createTask(task),
+                ApiResponse.created(taskService.createTask(taskRequest),
                         "success"));  // 201
     }
 
@@ -115,22 +127,11 @@ public class TaskController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "not found"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
         return ResponseEntity.noContent().build();             // deleted -> 204
     }
-
-    @Operation(summary = "Assign task by id to user")
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "success"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "not found"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
-    })
-    @PatchMapping("/{id}/assign/{userId}")
-    public ResponseEntity<ApiResponse<TaskResponse>> assignTaskToUser(@PathVariable Long id, @PathVariable Long userId) {
-        return ResponseEntity.ok(ApiResponse.ok(taskService.assignTaskToUser(id, userId), "success"));
-    }
-
 
 }

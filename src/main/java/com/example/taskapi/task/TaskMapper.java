@@ -1,13 +1,13 @@
 package com.example.taskapi.task;
 
-import com.example.taskapi.task.dto.TaskResponse;
 import com.example.taskapi.task.dto.TaskRequest;
+import com.example.taskapi.task.dto.TaskResponse;
 import org.mapstruct.*;
 
 
 @Mapper(componentModel = "spring")
 public interface TaskMapper {
-    @Mapping(source = "userId", target = "user.id")
+
     @Mapping(source = "taskStatus", target = "status")
     Task toEntity(TaskRequest dto);
 

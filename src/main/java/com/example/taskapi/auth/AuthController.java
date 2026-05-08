@@ -1,7 +1,10 @@
 package com.example.taskapi.auth;
 
+import com.example.taskapi.auth.dto.AuthRequest;
+import com.example.taskapi.auth.dto.AuthResponse;
+import com.example.taskapi.auth.dto.RefreshRequest;
+import com.example.taskapi.auth.dto.RegisterRequest;
 import com.example.taskapi.common.apiResponse.ApiResponse;
-import com.example.taskapi.auth.RefreshRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,6 @@
 package com.example.taskapi.user;
 
-import com.example.taskapi.auth.RegisterRequest;
+import com.example.taskapi.auth.dto.RegisterRequest;
 import com.example.taskapi.user.dto.UserRequest;
 import com.example.taskapi.user.dto.UserResponse;
 import org.mapstruct.BeanMapping;
