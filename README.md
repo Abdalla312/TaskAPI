@@ -245,6 +245,10 @@ mvn test
 mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
 ```
 
+### Testing Notes
+- Auth endpoints are covered by MockMvc integration tests (see `src/test/java/com/example/taskapi/auth/AuthControllerIntegrationTest.java`).
+- Tests run under the `test` Spring profile via `@ActiveProfiles("test")` in integration specs.
+
 ### Key Dependencies
 - **Spring Boot Starters:** Web, Data JPA, Security, Validation
 - **PostgreSQL Driver:** runtime scope
