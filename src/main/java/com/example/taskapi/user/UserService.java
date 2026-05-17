@@ -1,5 +1,6 @@
 package com.example.taskapi.user;
 
+import com.example.taskapi.auth.RefreshTokenRepository;
 import com.example.taskapi.common.exception.ResourceNotFoundException;
 import com.example.taskapi.common.exception.UserAlreadyExistsException;
 import com.example.taskapi.common.pagination.PageResponse;
@@ -9,6 +10,8 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,11 +23,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder,
+                       RefreshTokenRepository refreshTokenRepository) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     public UserResponse createUser(UserRequest dto) {
@@ -47,11 +53,19 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
-    @Transactional
-    public UserResponse updateUser(Long id, UserRequest dto) {
+    public UserResponse getUserDetails() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findByUsernameOrEmail(authentication.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("Invalid Authentication"));
+        return userMapper.toDTO(user);
+    }
 
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    @Transactional
+    public UserResponse updateUser(UserRequest dto) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findByUsernameOrEmail(authentication.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         log.debug("Update user from {} to {} ", user, userMapper.toEntity(dto));
 
         userMapper.updateEntityFromDto(dto, user);
@@ -60,9 +74,10 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long id) {
-        userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        userRepository.deleteById(id);
+        refreshTokenRepository.deleteByUser(user);
+        userRepository.delete(user);
     }
 
     public User saveNewUser(UserRequest dto) {
@@ -83,10 +98,12 @@ public class UserService {
     }
 
     public UserResponse setAdmin(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("Invalid user Id"));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setRole(Role.ADMIN);
         userRepository.save(user);
         log.info("Updated user: {} role to ADMIN", id);
         return userMapper.toDTO(user);
     }
+
 }

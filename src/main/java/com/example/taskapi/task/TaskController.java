@@ -8,6 +8,7 @@ import com.example.taskapi.task.dto.TaskRequest;
 import com.example.taskapi.task.dto.TaskResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/tasks")
+@RequestMapping("/api/v1/tasks")
 public class TaskController {
 
     private final TaskService taskService;
@@ -59,11 +60,11 @@ public class TaskController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
     })
     @GetMapping(params = "status")
-    public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getTasksByStatus(@RequestParam String status, Pageable pageable) {
+    public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getTasksByStatus(@RequestParam TaskStatus status, Pageable pageable) {
         return ResponseEntity.ok(
                 ApiResponse.ok(
                         PageResponse.from(
-                                taskService.findTasksByStatus(status, pageable)),
+                                taskService.findTasksByStatus(status.name(), pageable)),
                         "success"));
     }
 
@@ -74,7 +75,7 @@ public class TaskController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
     })
     @GetMapping(params = "title")
-    public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getTaskByTitle(@RequestParam String title, Pageable pageable) {
+    public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getTaskByTitle(@RequestParam @NotBlank String title, Pageable pageable) {
         return ResponseEntity.ok(
                 ApiResponse.ok(
                         PageResponse.from(

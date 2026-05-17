@@ -12,9 +12,11 @@ import lombok.Setter;
 public class TaskRequest {
 
     @NotBlank(groups = OnCreate.class)
+    @Pattern(regexp = "^[^<>]*$", groups = {OnCreate.class, OnPatch.class}, message = "Title must not contain '<' or '>'.")
     private String title;
 
     @NotBlank(groups = OnCreate.class)
+    @Pattern(regexp = "^[^<>]*$", groups = {OnCreate.class, OnPatch.class}, message = "Description must not contain '<' or '>'.")
     private String description;
 
     @NotBlank(groups = OnCreate.class, message = "Status is required")
