@@ -1,6 +1,6 @@
 ﻿# Task API
 
-A production-ready Task Management REST API built with Spring Boot 3.2, featuring JWT authentication, role-based access control, database migrations with Flyway, and comprehensive OpenAPI/Swagger documentation.
+A production-ready Task Management REST API built with Spring Boot 3.5, featuring JWT authentication with refresh tokens, role-based access control, database migrations with Flyway, and OpenAPI/Swagger documentation.
 
 ## Overview
 
@@ -19,17 +19,17 @@ This project demonstrates a well-structured Spring Boot application with:
 | Component      | Technology                                   |
 |----------------|----------------------------------------------|
 | **Language**   | Java 21                                      |
-| **Framework**  | Spring Boot 3.2.4                            |
+| **Framework**  | Spring Boot 3.5.14                           |
 | **Database**   | PostgreSQL                                   |
 | **ORM**        | Spring Data JPA (Hibernate)                  |
-| **Security**   | Spring Security + JWT (JJWT 0.12.6 & 0.12.7) |
+| **Security**   | Spring Security + JWT (JJWT 0.12.7)          |
 | **Migrations** | Flyway DB                                    |
 | **Mapping**    | MapStruct 1.6.3                              |
-| **API Docs**   | SpringDoc OpenAPI 2.5.0                      |
+| **API Docs**   | SpringDoc OpenAPI 2.8.0                      |
 | **Validation** | Jakarta Bean Validation                      |
-| **Build**      | Maven 3.11.0                                 |
-| **Testing**    | JUnit 5 + Mockito                            |
-| **Utilities**  | Lombok 1.18.32                               |
+| **Build**      | Maven                                        |
+| **Testing**    | JUnit 5 + Mockito + Testcontainers           |
+| **Utilities**  | Lombok 1.18.34                               |
 
 ## Project Structure
 
@@ -38,7 +38,6 @@ src/main/java/com/example/taskapi/
 ├── TaskApiApplication.java      # Application entry point
 ├── auth/                         # Authentication endpoints
 ├── common/                       # Shared components
-│   ├── HealthController.java    # Health check endpoint
 │   ├── apiResponse/             # API response wrappers
 │   ├── dto/                     # Data transfer objects
 │   ├── exception/               # Exception handlers
@@ -66,37 +65,40 @@ src/main/java/com/example/taskapi/
 ## API Endpoints
 
 ### Authentication (Public)
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login and receive JWT token
-- `POST /api/auth/refresh` - Refresh token request
+- `POST /api/v1/auth/register` - Register new user
+- `POST /api/v1/auth/login` - Login and receive access/refresh tokens
+- `POST /api/v1/auth/refresh` - Refresh access token
+- `POST /api/v1/auth/logout` - Revoke refresh token
 
 ### Health Check
 - `GET /actuator/health` - Check API status
 
 ### Tasks (Protected)
-- `GET /api/tasks` - List all tasks (paginated)
-- `GET /api/tasks/{id}` - Get task by ID
-- `GET /api/tasks?status=PENDING` - Filter tasks by status
-- `GET /api/tasks?title=Example` - Search tasks by title
-- `POST /api/tasks` - Create new task
-- `PATCH /api/tasks/{id}` - Update task
-- `DELETE /api/tasks/{id}` - Delete task
+- `GET /api/v1/tasks` - List authenticated user's tasks (paginated)
+- `GET /api/v1/tasks/admin-all` - List all tasks (ADMIN)
+- `GET /api/v1/tasks/{id}` - Get task by ID
+- `GET /api/v1/tasks?status=TODO` - Filter tasks by status
+- `GET /api/v1/tasks?title=Example` - Search tasks by title
+- `POST /api/v1/tasks` - Create a task for the authenticated user
+- `PATCH /api/v1/tasks/{id}` - Update a task (owner only)
+- `DELETE /api/v1/tasks/{id}` - Delete a task (ADMIN)
 
 ### Users (Protected)
-- `GET /api/users` - List all users (paginated)
-- `GET /api/users/{id}` - Get user by ID
-- `POST /api/users` - Create new user
-- `PATCH /api/users/{id}` - Update user
-- `DELETE /api/users/{id}` - Delete user
+- `GET /api/v1/users/me` - Get authenticated user details
+- `PATCH /api/v1/users/me` - Update authenticated user details
+- `GET /api/v1/users` - List all users (ADMIN)
+- `GET /api/v1/users/{id}` - Get user by ID (ADMIN)
+- `DELETE /api/v1/users/{id}` - Delete user (ADMIN)
+- `PATCH /api/v1/users/admin/{id}` - Promote user to ADMIN
 
 ## Authentication & Security
 
 ### JWT Authentication
 
-All endpoints except `/api/auth/*` are **protected** and require JWT authentication. After login/registration, include the JWT token in the `Authorization` header:
+All endpoints except `/api/v1/auth/**` are **protected** and require JWT authentication. After login/registration, include the access token in the `Authorization` header:
 
 ```bash
-curl -H "Authorization: Bearer <your_jwt_token>" http://localhost:8000/api/tasks
+curl -H "Authorization: Bearer <your_access_token>" http://localhost:8000/api/v1/tasks
 ```
 
 ### Roles
@@ -107,10 +109,12 @@ The application supports the following user roles:
 
 ### How JWT Works
 
-1. User registers via `POST /api/auth/register` or logs in via `POST /api/auth/login`
-2. API returns a JWT token in the response
+1. User registers via `POST /api/v1/auth/register` or logs in via `POST /api/v1/auth/login`
+   - Login accepts `identifier` (username or email)
+2. API returns an access token and refresh token in the response
 3. Client includes token in subsequent requests in the `Authorization: Bearer <token>` header
-4. Server validates the token before processing the request
+4. Server validates the token and uses `userId` and `role` claims for authorization
+5. Refresh tokens can be rotated via `POST /api/v1/auth/refresh` and revoked via `POST /api/v1/auth/logout`
 
 ## Quick Start
 
@@ -130,7 +134,7 @@ The application supports the following user roles:
 
 2. **Verify prerequisites:**
    ```bash
-   java -version          # Verify Java 17+
+    java -version          # Verify Java 21+
    mvn -v                 # Verify Maven
    ```
 
@@ -145,8 +149,8 @@ The application supports the following user roles:
      export DB_USERNAME=postgres
      export DB_PASSWORD=your_password
      
-     # JWT secret (REQUIRED - generate a strong secret key)
-     export JWT_SECRET=your-secret-key-here-minimum-32-characters-recommended
+     # JWT secret (REQUIRED - Base64-encoded)
+     export JWT_SECRET=your-base64-encoded-secret
      ```
 
 4. **Build the project:**
@@ -166,12 +170,7 @@ The application supports the following user roles:
 # Health check
 curl http://localhost:8000/actuator/health
 
-# Expected response:
-{
-  "status": "UP",
-  "timestamp": "2026-04-28T12:00:00",
-  "message": "Task API is running! 🚀"
-}
+# Expected response contains "status": "UP"
 ```
 
 ## API Documentation
@@ -189,6 +188,7 @@ Migrations are managed with Flyway and located in `src/main/resources/db/Migrati
 - `V4__align_tasks_schema_with_jpa.sql` - JPA alignment
 - `V5__alter_userid_foreign_key_to_nullable.sql` - Foreign key adjustment
 - `V6__add_role_to_users.sql` - Role support
+- `V7__create_refresh_tokens_table.sql` - Refresh token storage
 
 Migrations run automatically on application startup.
 
@@ -197,15 +197,17 @@ Migrations run automatically on application startup.
 Key settings in `src/main/resources/application.yml`:
 - **Server port:** 8000
 - **Database:** PostgreSQL (configurable via `DB_USERNAME` and `DB_PASSWORD` env vars)
+- **Env import:** `.env` is loaded automatically if present (`spring.config.import`)
 - **JPA Hibernate DDL:** `validate` (schema validation only - depends on Flyway migrations)
 - **Flyway:** Enabled with automatic migration on startup
-- **JWT Secret:** Must be set via `JWT_SECRET` environment variable (no default value)
+- **JWT Secret:** Must be set via `JWT_SECRET` environment variable (Base64-encoded)
+- **JWT Expiry:** `jwt.access-token-expiry` and `jwt.refresh-token-expiry` are in milliseconds
 
 ### Required Environment Variables
 
 | Variable      | Description                      | Example               |
 |---------------|----------------------------------|-----------------------|
-| `JWT_SECRET`  | Secret key for JWT token signing | `my-super-secret-key` |
+| `JWT_SECRET`  | Base64-encoded JWT signing key   | `base64-secret`       |
 | `DB_USERNAME` | PostgreSQL username              | `postgres`            |
 | `DB_PASSWORD` | PostgreSQL password              | `your_password`       |
 
@@ -216,7 +218,8 @@ Key settings in `src/main/resources/application.yml`:
 - **title** (String) - Task title, required, max 50 characters
 - **description** (String) - Task description, required, long text
 - **status** (TaskStatus) - Task status, required - Valid values: `TODO`, `IN_PROGRESS`, `DONE`
-- **user_id** (Long) - Foreign key to assigned user, nullable
+- **API field:** `taskStatus` is used in request/response payloads
+- **user_id** (Long) - Foreign key to assigned user
 - **created_at** (LocalDateTime) - Auto-set on creation, not updatable
 - **updated_at** (LocalDateTime) - Auto-updated on any modification
 - **Index:** On `status` column for efficient filtering
@@ -274,7 +277,7 @@ mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=
 
 ### Register a New User
 ```bash
-curl -X POST http://localhost:8000/api/auth/register \
+curl -X POST http://localhost:8000/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "username": "john_doe",
@@ -284,65 +287,62 @@ curl -X POST http://localhost:8000/api/auth/register \
 
 # Response:
 {
+  "status": 201,
+  "message": "success",
   "data": {
-    "id": 1,
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "<refresh_token>",
     "username": "john_doe",
-    "email": "john@example.com",
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    "role": "ROLE_USER"
   },
-  "message": "Registered successfully",
-  "timestamp": "2026-04-28T12:00:00"
+  "timeStamp": "2026-04-28T12:00:00"
 }
 ```
 
 ### Login
 ```bash
-curl -X POST http://localhost:8000/api/auth/login \
+curl -X POST http://localhost:8000/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "john_doe",
+    "identifier": "john_doe",
     "password": "secure_password"
   }'
 
 # Response:
 {
+  "status": 200,
+  "message": "success",
   "data": {
-    "id": 1,
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "<refresh_token>",
     "username": "john_doe",
-    "email": "john@example.com",
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    "role": "ROLE_USER"
   },
-  "message": "Login successful",
-  "timestamp": "2026-04-28T12:00:00"
+  "timeStamp": "2026-04-28T12:00:00"
 }
 ```
 
 ### Create a Task
 ```bash
 # Note: Replace <token> with the JWT token received from login/register
-curl -X POST http://localhost:8000/api/tasks \
+curl -X POST http://localhost:8000/api/v1/tasks \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
     "title": "Complete project documentation",
     "description": "Write comprehensive docs and examples",
-    "status": "TODO"
+    "taskStatus": "TODO"
   }'
 
-# Valid status values: TODO, PENDING, IN_PROGRESS, COMPLETED
+# Valid status values: TODO, IN_PROGRESS, DONE
 ```
 
-### Create a User
+### Refresh an Access Token
 ```bash
-# Note: Replace <token> with the JWT token received from login/register
-curl -X POST http://localhost:8000/api/users \
+curl -X POST http://localhost:8000/api/v1/auth/refresh \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
   -d '{
-    "username": "jane_smith",
-    "email": "jane@example.com",
-    "password": "another_secure_password",
-    "role": "USER"
+    "refreshToken": "<refresh_token>"
   }'
 ```
 
