@@ -53,6 +53,7 @@ class TaskServiceTest {
 
         when(ctx.getAuthentication()).thenReturn(auth);
         when(auth.getName()).thenReturn(authUsername);
+        when(auth.getAuthorities()).thenReturn(List.of());
 
         SecurityContextHolder.setContext(ctx);
     }
@@ -129,11 +130,15 @@ class TaskServiceTest {
 
     @Test
     void should_throwException_when_taskNotFound() {
-        when(taskRepository.findById(999L)).thenReturn(Optional.empty());
+        User user = makeUser(1L);
+        when(userRepository.findByUsernameOrEmail(authUsername)).thenReturn(Optional.of(user));
+        when(taskRepository.findByIdAndUser(999L, user)).thenReturn(Optional.empty());
+
         assertThatThrownBy(() -> taskService.getTaskById(999L))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("task id not found");
-        verify(taskRepository).findById(999L);
+
+        verify(taskRepository).findByIdAndUser(999L, user);
     }
 
     @Test
@@ -144,14 +149,15 @@ class TaskServiceTest {
         Task t1 = makeTask(1L, user, "t1");
         Task t2 = makeTask(2L, user, "t2");
 
-        // map tasks to responses
         TaskResponse r1 = makeTaskResponse(1L, "t1");
         TaskResponse r2 = makeTaskResponse(2L, "t2");
 
-        when(taskRepository.findAllByStatus(TaskStatus.TODO, pageable))
+        when(userRepository.findByUsernameOrEmail(authUsername)).thenReturn(Optional.of(user));
+        when(taskRepository.findAllByStatusAndUser(TaskStatus.TODO, user, pageable))
                 .thenReturn(new PageImpl<>(List.of(t1, t2), pageable, 2));
         when(taskMapper.toDTO(t1)).thenReturn(r1);
         when(taskMapper.toDTO(t2)).thenReturn(r2);
+
         var page = taskService.findTasksByStatus("todo", pageable);
 
         assertThat(page.getContent()).hasSize(2);
@@ -161,7 +167,9 @@ class TaskServiceTest {
     @Test
     void should_throwBadRequest_when_invalidStatus() {
         Pageable pageable = PageRequest.of(0, 10);
-        // method should throw BadRequestException for invalid status string
+        User user = makeUser(1L);
+        when(userRepository.findByUsernameOrEmail(authUsername)).thenReturn(Optional.of(user));
+
         assertThatThrownBy(() -> taskService.findTasksByStatus("invalid_status", pageable))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Invalid input");
@@ -199,5 +207,28 @@ class TaskServiceTest {
         taskService.deleteTask(7L);
 
         verify(taskRepository).deleteById(7L);
+    }
+
+    @Test
+    void should_returnFilteredTasks_when_titleProvided() {
+        Pageable pageable = PageRequest.of(0, 10);
+        User user = makeUser(1L);
+
+        Task t1 = makeTask(1L, user, "Alpha");
+        Task t2 = makeTask(2L, user, "Beta");
+
+        TaskResponse r1 = makeTaskResponse(1L, "Alpha");
+        TaskResponse r2 = makeTaskResponse(2L, "Beta");
+
+        when(userRepository.findByUsernameOrEmail(authUsername)).thenReturn(Optional.of(user));
+        when(taskRepository.findByTitleContainingIgnoreCaseAndUser("a", user, pageable))
+                .thenReturn(new PageImpl<>(List.of(t1, t2), pageable, 2));
+        when(taskMapper.toDTO(t1)).thenReturn(r1);
+        when(taskMapper.toDTO(t2)).thenReturn(r2);
+
+        var page = taskService.findTaskByTitle("a", pageable);
+
+        assertThat(page.getContent()).hasSize(2);
+        assertThat(page.getContent().get(0).getTitle()).isEqualTo("Alpha");
     }
 }

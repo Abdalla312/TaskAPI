@@ -17,3 +17,6 @@ jwt:
   secret: MDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUY=
   access-token-expiry: 9000000
   refresh-token-expiry: 2592000000
+
+rate-limit:
+  enabled: false

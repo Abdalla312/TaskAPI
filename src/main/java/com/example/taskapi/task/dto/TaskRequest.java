@@ -19,7 +19,7 @@ public class TaskRequest {
     @Pattern(regexp = "^[^<>]*$", groups = {OnCreate.class, OnPatch.class}, message = "Description must not contain '<' or '>'.")
     private String description;
 
-    @NotBlank(groups = OnCreate.class, message = "Status is required")
+    @NotBlank(groups = OnCreate.class, message = "taskStatus is required")
     @Pattern(regexp = "TODO|IN_PROGRESS|DONE", groups = {OnCreate.class, OnPatch.class}, message = "Status should be TODO, IN_PROGRESS, or DONE.")
     private String taskStatus;
 }

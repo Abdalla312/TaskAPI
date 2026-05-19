@@ -70,7 +70,9 @@ public class AuthService {
         String newJwt = jwtService.generateToken(userDetails);
         String role = userDetails.getAuthorities().iterator().next().getAuthority();
         // revoke old then issue new one
-        return new AuthResponse(newJwt, null, user.getUsername(), role);
+        refreshTokenService.revokeToken(verifiedToken.getToken());
+        String newRefreshToken = refreshTokenService.createRefreshToken(user).getToken();
+        return new AuthResponse(newJwt, newRefreshToken, user.getUsername(), role);
     }
     @Transactional
     public void logout(RefreshRequest request){

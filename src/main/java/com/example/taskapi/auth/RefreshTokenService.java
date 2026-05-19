@@ -2,8 +2,12 @@ package com.example.taskapi.auth;
 
 import com.example.taskapi.common.exception.UnauthorizedException;
 import com.example.taskapi.user.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -12,6 +16,7 @@ import java.util.UUID;
 @Service
 public class RefreshTokenService {
 
+    private static final Logger log = LoggerFactory.getLogger(RefreshTokenService.class);
 
     private final RefreshTokenRepository refreshTokenRepository;
     @Value("${jwt.refresh-token-expiry}")
@@ -51,5 +56,18 @@ public class RefreshTokenService {
                 });
     }
 
-}
+    @Transactional
+    @Scheduled(
+            fixedDelayString = "${auth.refresh-token-cleanup-interval:PT6H}",
+            initialDelayString = "${auth.refresh-token-cleanup-initial-delay:PT5M}"
+    )
+    public void cleanupRefreshTokens() {
+        Instant now = Instant.now();
+        long expired = refreshTokenRepository.deleteByExpiresAtBefore(now);
+        long revoked = refreshTokenRepository.deleteByRevokedTrue();
+        if (expired > 0 || revoked > 0) {
+            log.info("Refresh token cleanup: expired={}, revoked={}", expired, revoked);
+        }
+    }
 
+}

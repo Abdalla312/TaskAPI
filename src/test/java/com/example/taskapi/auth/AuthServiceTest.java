@@ -4,6 +4,7 @@ import com.example.taskapi.auth.dto.AuthRequest;
 import com.example.taskapi.auth.dto.AuthResponse;
 import com.example.taskapi.auth.dto.RefreshRequest;
 import com.example.taskapi.auth.dto.RegisterRequest;
+import com.example.taskapi.common.exception.UnauthorizedException;
 import com.example.taskapi.security.CustomUserDetails;
 import com.example.taskapi.security.JwtService;
 import com.example.taskapi.user.Role;
@@ -20,7 +21,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -125,7 +128,7 @@ public class AuthServiceTest {
 
     @Test
     void should_refresh_token_successfully() {
-        //create refreshRequest , user, refreshToken
+        // Arrange
         RefreshRequest request = new RefreshRequest();
         request.setRefreshToken("refresh-token");
 
@@ -135,19 +138,47 @@ public class AuthServiceTest {
         user.setEmail("test@example.com");
         user.setRole(Role.USER);
 
-        RefreshToken token = new RefreshToken();
-        token.setUser(user);
-        token.setToken("refresh-token");
+        RefreshToken verifiedToken = new RefreshToken();
+        verifiedToken.setUser(user);
+        verifiedToken.setToken("refresh-token");
 
-        when(refreshTokenService.verifyToken("refresh-token")).thenReturn(token);
+        RefreshToken newToken = new RefreshToken();
+        newToken.setUser(user);
+        newToken.setToken("new-refresh-token");
+
+        when(refreshTokenService.verifyToken("refresh-token")).thenReturn(verifiedToken);
         when(jwtService.generateToken(any(CustomUserDetails.class))).thenReturn("new-access-token");
+        when(refreshTokenService.createRefreshToken(user)).thenReturn(newToken);
+
         // Act
         AuthResponse response = authService.refresh(request);
 
         // Assert
         assertThat(response.getAccessToken()).isEqualTo("new-access-token");
-        assertThat(response.getRefreshToken()).isNull();
+        assertThat(response.getRefreshToken()).isEqualTo("new-refresh-token");
         assertThat(response.getUsername()).isEqualTo("test_user");
+        assertThat(response.getRole()).isEqualTo("ROLE_USER");
 
+        verify(refreshTokenService).verifyToken("refresh-token");
+        verify(refreshTokenService).revokeToken("refresh-token");
+        verify(refreshTokenService).createRefreshToken(user);
+    }
+
+    @Test
+    void should_fail_refresh_when_token_invalid() {
+        // Arrange
+        RefreshRequest request = new RefreshRequest();
+        request.setRefreshToken("refresh-token");
+
+        when(refreshTokenService.verifyToken("refresh-token"))
+                .thenThrow(new UnauthorizedException("Invalid refresh token"));
+
+        // Act + Assert
+        assertThatThrownBy(() -> authService.refresh(request))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessageContaining("Invalid refresh token");
+
+        verify(refreshTokenService, never()).revokeToken(anyString());
+        verify(refreshTokenService, never()).createRefreshToken(any(User.class));
     }
 }

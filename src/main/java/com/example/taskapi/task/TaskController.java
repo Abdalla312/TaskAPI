@@ -7,6 +7,7 @@ import com.example.taskapi.common.validation.OnPatch;
 import com.example.taskapi.task.dto.TaskRequest;
 import com.example.taskapi.task.dto.TaskResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.domain.Pageable;
@@ -53,14 +54,17 @@ public class TaskController {
         );
     }
 
-    @Operation(summary = "Get task by status")
+    @Operation(summary = "Get task by status", description = "Example: /api/v1/tasks?status=TODO")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "success"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "not found"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
     })
     @GetMapping(params = "status")
-    public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getTasksByStatus(@RequestParam TaskStatus status, Pageable pageable) {
+    public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getTasksByStatus(
+            @Parameter(description = "Task status filter", example = "TODO")
+            @RequestParam TaskStatus status,
+            Pageable pageable) {
         return ResponseEntity.ok(
                 ApiResponse.ok(
                         PageResponse.from(
@@ -68,14 +72,17 @@ public class TaskController {
                         "success"));
     }
 
-    @Operation(summary = "Get task by title")
+    @Operation(summary = "Get task by title", description = "Example: /api/v1/tasks?title=report")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "success"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "not found"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "server error")
     })
     @GetMapping(params = "title")
-    public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getTaskByTitle(@RequestParam @NotBlank String title, Pageable pageable) {
+    public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> getTaskByTitle(
+            @Parameter(description = "Case-insensitive title filter", example = "report")
+            @RequestParam @NotBlank String title,
+            Pageable pageable) {
         return ResponseEntity.ok(
                 ApiResponse.ok(
                         PageResponse.from(
